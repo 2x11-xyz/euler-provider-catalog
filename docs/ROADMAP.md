@@ -39,7 +39,8 @@ or below that threshold still requires human review.
 2. Enable required code-owner review using the checked-in `CODEOWNERS` rules
    for `sources/`, `curated/`, schemas, promotion policy, stable state, and
    workflows.
-3. Configure dedicated discovery credentials as repository secrets:
+3. Inject dedicated observation-only discovery credentials through GitHub
+   Actions for official endpoints that require authentication:
    `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, and `XAI_API_KEY`.
    `OPENROUTER_API_KEY` remains optional.
 4. Restrict each credential to model reads when the provider supports endpoint
@@ -48,8 +49,13 @@ or below that threshold still requires human review.
    Pull requests created with the repository `GITHUB_TOKEN` do not reliably
    trigger the independent CI run required for protected promotion.
 
-The scheduled workflow fails closed while any required discovery credential is
-absent; credential readiness must be checked before enabling promotion.
+These are catalog-operator credentials, never Euler user credentials or
+published catalog content. The repository stores only their GitHub secret
+references. The scheduled workflow fails closed while any required discovery
+credential is absent; credential readiness must be checked before enabling
+promotion. A zero-credential deployment must accept curated official-doc
+coverage for those providers rather than pretending to have complete daily API
+discovery.
 
 ### Stable state
 

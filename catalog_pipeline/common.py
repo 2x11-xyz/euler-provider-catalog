@@ -20,7 +20,11 @@ MODEL_REQUIRED_FIELDS = {
     "reasoning_efforts",
 }
 MODEL_OPTIONAL_FIELDS = {"max_output_tokens"}
+MODEL_METADATA_FIELDS = tuple(
+    sorted((MODEL_REQUIRED_FIELDS | MODEL_OPTIONAL_FIELDS) - {"id", "status"})
+)
 PROVIDER_ID_PATTERN = re.compile(r"^[a-z][a-z0-9-]{0,63}$")
+RELEASE_ID_PATTERN = re.compile(r"^catalog-v1-[0-9]{8}t[0-9]{6}z-[a-f0-9]{64}$")
 
 
 class CatalogError(ValueError):
@@ -33,6 +37,23 @@ def canonical_json_bytes(value: Any) -> bytes:
 
 def sha256_hex(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def catalog_release_id(
+    *,
+    generated_at: str,
+    minimum_euler_version: str,
+    artifacts: dict[str, Any],
+) -> str:
+    timestamp = datetime.fromisoformat(generated_at[:-1] + "+00:00")
+    identity = {
+        "artifacts": artifacts,
+        "generated_at": generated_at,
+        "minimum_euler_version": minimum_euler_version,
+        "schema_version": 1,
+    }
+    digest = sha256_hex(canonical_json_bytes(identity))
+    return f"catalog-v1-{timestamp.strftime('%Y%m%dt%H%M%Sz').lower()}-{digest}"
 
 
 def read_json(path: Path, *, max_bytes: int = 16 * 1024 * 1024) -> tuple[Any, bytes]:

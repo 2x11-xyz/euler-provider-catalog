@@ -90,7 +90,7 @@
   "$defs": {
     "release_id": {
       "type": "string",
-      "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$"
+      "pattern": "^catalog-v1-[0-9]{8}t[0-9]{6}z-[a-f0-9]{64}$"
     },
     "sha256": {
       "type": "string",
@@ -205,12 +205,12 @@
                 "uniqueItems": true,
                 "items": {
                   "enum": [
-                    "display_name",
                     "context_window_tokens",
+                    "display_name",
                     "max_output_tokens",
-                    "supports_tools",
+                    "reasoning_efforts",
                     "supports_reasoning",
-                    "reasoning_efforts"
+                    "supports_tools"
                   ]
                 }
               }

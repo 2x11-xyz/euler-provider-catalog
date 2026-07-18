@@ -6,6 +6,7 @@ from pathlib import Path
 
 import jsonschema
 
+from catalog_pipeline.common import MODEL_METADATA_FIELDS
 from catalog_pipeline.promotion import classify_promotion, load_promotion_policy
 from catalog_pipeline.release import load_release
 
@@ -48,6 +49,13 @@ class SchemaTests(unittest.TestCase):
         policy = load_promotion_policy(ROOT / "promotion-policy.json")
         diff = classify_promotion(None, release, policy)
         self._validator("diff-v1.schema.json").validate(diff)
+
+    def test_diff_metadata_fields_match_the_runtime_model_contract(self) -> None:
+        schema = json.loads((ROOT / "schema" / "diff-v1.schema.json").read_bytes())
+        fields = schema["$defs"]["provider_diff"]["properties"]["metadata_changes"]["items"][
+            "properties"
+        ]["fields"]["items"]["enum"]
+        self.assertEqual(fields, list(MODEL_METADATA_FIELDS))
 
 
 if __name__ == "__main__":

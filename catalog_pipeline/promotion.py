@@ -1,40 +1,20 @@
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass
+import sys
 from pathlib import Path
 from typing import Any
 
-from .common import (
-    CatalogError,
-    canonical_json_bytes,
-    read_json,
-    require_object,
-    sha256_hex,
-    write_or_check,
+from .common import CatalogError, MODEL_METADATA_FIELDS, canonical_json_bytes, write_or_check
+from .promotion_contract import (
+    PromotionPolicy,
+    load_promotion_policy,
+    promotion_decision,
+    promotion_reasons,
+    shrink_basis_points,
+    validate_promotion_diff,
 )
 from .release import ReleaseArtifacts, load_release
-
-
-@dataclass(frozen=True)
-class PromotionPolicy:
-    maximum_shrink_basis_points: int
-    sha256: str
-
-
-def load_promotion_policy(path: Path) -> PromotionPolicy:
-    value, raw = read_json(path, max_bytes=64 * 1024)
-    policy = require_object(value, str(path))
-    if set(policy) != {"schema_version", "maximum_shrink_basis_points"}:
-        raise CatalogError("promotion policy has an invalid shape")
-    maximum = policy["maximum_shrink_basis_points"]
-    if policy["schema_version"] != 1 or not isinstance(maximum, int) or isinstance(maximum, bool):
-        raise CatalogError("promotion policy is invalid")
-    if not 0 <= maximum <= 10_000:
-        raise CatalogError("promotion policy shrink limit is invalid")
-    if raw != canonical_json_bytes(policy):
-        raise CatalogError("promotion policy is not canonical JSON")
-    return PromotionPolicy(maximum_shrink_basis_points=maximum, sha256=sha256_hex(raw))
 
 
 def _governed_digest(release: ReleaseArtifacts, provider_id: str, kind: str) -> str | None:
@@ -45,12 +25,6 @@ def _governed_digest(release: ReleaseArtifacts, provider_id: str, kind: str) -> 
     if len(matches) != 1:
         raise CatalogError(f"{provider_id} provenance has ambiguous {kind} input")
     return matches[0]
-
-
-def _shrink_basis_points(before_count: int, removed_count: int) -> int:
-    if before_count == 0 or removed_count == 0:
-        return 0
-    return (removed_count * 10_000 + before_count - 1) // before_count
 
 
 def _provider_diff(
@@ -76,12 +50,11 @@ def _provider_diff(
     ]
     metadata_changes = []
     for model_id in common_ids:
-        fields = sorted(
+        fields = [
             field
-            for field in set(before_models[model_id]) | set(after_models[model_id])
-            if field not in {"id", "status"}
-            and before_models[model_id].get(field) != after_models[model_id].get(field)
-        )
+            for field in MODEL_METADATA_FIELDS
+            if before_models[model_id].get(field) != after_models[model_id].get(field)
+        ]
         if fields:
             metadata_changes.append({"id": model_id, "fields": fields})
     provider_fields = []
@@ -96,7 +69,7 @@ def _provider_diff(
     return {
         "before_model_count": previous_count,
         "after_model_count": len(after_models),
-        "shrink_basis_points": _shrink_basis_points(previous_count, len(removed)),
+        "shrink_basis_points": shrink_basis_points(previous_count, len(removed)),
         "provider_fields_changed": provider_fields,
         "models_added": sorted(after_ids - before_ids),
         "models_removed": removed,
@@ -123,42 +96,14 @@ def classify_promotion(
         provider_id: _provider_diff(provider_id, previous, candidate)
         for provider_id in provider_ids
     }
-    reasons: set[str] = set()
-    if previous is None:
-        reasons.add("bootstrap")
-    if previous_providers != candidate_providers:
-        reasons.add("provider_set_changed")
-    for change in providers.values():
-        if change["models_added"]:
-            reasons.add("model_addition")
-        if change["models_removed"]:
-            reasons.add("model_removal")
-        if change["lifecycle_changes"]:
-            reasons.add("model_lifecycle_changed")
-        if change["metadata_changes"]:
-            reasons.add("model_metadata_changed")
-        if change["provider_fields_changed"]:
-            reasons.add("provider_metadata_changed")
-        if change["source_policy_changed"]:
-            reasons.add("source_policy_changed")
-        if change["curated_input_changed"]:
-            reasons.add("curated_input_changed")
-        if change["shrink_basis_points"] > policy.maximum_shrink_basis_points:
-            reasons.add("excessive_shrink")
-
-    catalog_unchanged = (
-        previous is not None
-        and previous.encoded["catalog-v1.json"] == candidate.encoded["catalog-v1.json"]
+    bootstrap = previous is None
+    reasons = promotion_reasons(
+        providers,
+        bootstrap=bootstrap,
+        maximum_shrink_basis_points=policy.maximum_shrink_basis_points,
     )
-    if catalog_unchanged:
-        decision = "no_change"
-    elif "excessive_shrink" in reasons:
-        decision = "blocked"
-    elif previous is not None and reasons == {"model_addition"}:
-        decision = "addition_only"
-    else:
-        decision = "review_required"
-    return {
+    decision = promotion_decision(reasons, bootstrap=bootstrap)
+    diff = {
         "schema_version": 1,
         "from_release_id": previous.manifest["release_id"] if previous else None,
         "to_release_id": candidate.manifest["release_id"],
@@ -170,6 +115,7 @@ def classify_promotion(
         },
         "providers": providers,
     }
+    return validate_promotion_diff(diff)
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -195,7 +141,7 @@ def main() -> int:
             check=args.check,
         )
     except CatalogError as error:
-        print(f"promotion classification failed: {error}")
+        print(f"promotion classification failed: {error}", file=sys.stderr)
         return 1
     print(f"promotion decision: {diff['decision']}")
     return int(diff["decision"] == "blocked")

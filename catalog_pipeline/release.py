@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from datetime import datetime
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 from .common import (
     CatalogError,
     PROVIDER_ID_PATTERN,
+    RELEASE_ID_PATTERN,
+    catalog_release_id,
     canonical_json_bytes,
     read_json,
     require_array,
@@ -19,6 +20,7 @@ from .common import (
     validate_model_id,
     validate_timestamp,
 )
+from .promotion_contract import validate_promotion_diff
 
 
 RUNTIME_ARTIFACTS = ("catalog-v1.json", "manifest-v1.json", "provenance-v1.json")
@@ -27,7 +29,6 @@ MODEL_LIMITS = {
     "maximum_display_name_bytes": 256,
     "maximum_token_limit": 20_000_000,
 }
-RELEASE_ID_PATTERN = re.compile(r"^[a-z0-9][a-z0-9._-]{0,127}$")
 VERSION_PATTERN = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+$")
 
 
@@ -37,6 +38,21 @@ class ReleaseArtifacts:
     catalog: dict[str, Any]
     provenance: dict[str, Any]
     encoded: dict[str, bytes]
+
+
+def _valid_provenance_path(path: str, provider_id: str, kind: str) -> bool:
+    parsed = PurePosixPath(path)
+    if (
+        parsed.is_absolute()
+        or "\\" in path
+        or any(part in {"", ".", ".."} for part in parsed.parts)
+    ):
+        return False
+    if kind == "source_policy":
+        return path == f"sources/{provider_id}.json"
+    if kind == "curated":
+        return path == f"curated/{provider_id}.json"
+    return len(parsed.parts) == 3 and parsed.parts[:2] == ("observations", provider_id)
 
 
 def _directory_entries(directory: Path) -> set[str]:
@@ -201,6 +217,7 @@ def _validate_provenance(
                 or not isinstance(entry["path"], str)
                 or not entry["path"]
                 or len(entry["path"]) > 256
+                or not _valid_provenance_path(entry["path"], provider_id, kind)
                 or not isinstance(byte_count, int)
                 or isinstance(byte_count, bool)
                 or not 0 < byte_count <= 16 * 1024 * 1024
@@ -266,10 +283,11 @@ def load_release(directory: Path, *, stable: bool = False) -> ReleaseArtifacts:
             raise CatalogError(f"{directory}/{name} does not match its manifest digest")
     _validate_catalog(catalog)
     _validate_provenance(provenance, catalog, manifest)
-    generated_at = datetime.fromisoformat(manifest["generated_at"][:-1] + "+00:00")
-    timestamp = generated_at.strftime("%Y%m%dt%H%M%Sz").lower()
-    digest = sha256_hex(encoded["catalog-v1.json"] + encoded["provenance-v1.json"])[:12]
-    expected_release_id = f"catalog-v1-{timestamp}-{digest}"
+    expected_release_id = catalog_release_id(
+        generated_at=manifest["generated_at"],
+        minimum_euler_version=manifest["minimum_euler_version"],
+        artifacts=manifest["artifacts"],
+    )
     if manifest["release_id"] != expected_release_id:
         raise CatalogError("manifest release id does not authenticate the release bytes")
 
@@ -278,8 +296,7 @@ def load_release(directory: Path, *, stable: bool = False) -> ReleaseArtifacts:
         diff = require_object(diff, f"{directory}/diff-v1.json")
         if raw != canonical_json_bytes(diff):
             raise CatalogError(f"{directory}/diff-v1.json is not canonical JSON")
-        if diff.get("schema_version") != 1 or diff.get("to_release_id") != manifest["release_id"]:
-            raise CatalogError("stable diff does not identify its release")
+        validate_promotion_diff(diff, expected_to_release_id=manifest["release_id"])
     return ReleaseArtifacts(
         manifest=manifest,
         catalog=catalog,

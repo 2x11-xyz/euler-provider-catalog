@@ -17,7 +17,7 @@
     },
     "release_id": {
       "type": "string",
-      "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$"
+      "pattern": "^catalog-v1-[0-9]{8}t[0-9]{6}z-[a-f0-9]{64}$"
     },
     "generated_at": {
       "type": "string",

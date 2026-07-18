@@ -5,18 +5,23 @@ import json
 import shutil
 import tempfile
 import unittest
-from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable
 from unittest.mock import patch
 
-from catalog_pipeline.common import CatalogError, canonical_json_bytes, sha256_hex
+from catalog_pipeline.common import (
+    CatalogError,
+    catalog_release_id,
+    canonical_json_bytes,
+    sha256_hex,
+)
 from catalog_pipeline.promotion import (
     PromotionPolicy,
     classify_promotion,
     load_promotion_policy,
     main as promotion_main,
 )
+from catalog_pipeline.promotion_contract import validate_promotion_diff
 from catalog_pipeline.release import ReleaseArtifacts, load_release
 
 
@@ -48,10 +53,11 @@ def changed_release(
             "sha256": sha256_hex(provenance_bytes),
         },
     }
-    generated_at = datetime.fromisoformat(manifest["generated_at"][:-1] + "+00:00")
-    timestamp = generated_at.strftime("%Y%m%dt%H%M%Sz").lower()
-    release_digest = sha256_hex(catalog_bytes + provenance_bytes)[:12]
-    manifest["release_id"] = f"catalog-v1-{timestamp}-{release_digest}"
+    manifest["release_id"] = catalog_release_id(
+        generated_at=manifest["generated_at"],
+        minimum_euler_version=manifest["minimum_euler_version"],
+        artifacts=manifest["artifacts"],
+    )
     return ReleaseArtifacts(
         manifest=manifest,
         catalog=catalog,
@@ -154,6 +160,17 @@ class PromotionTests(unittest.TestCase):
         self.assertEqual(diff["decision"], "review_required")
         self.assertIn("source_policy_changed", diff["reasons"])
 
+    def test_governed_input_change_requires_review_when_catalog_is_unchanged(self) -> None:
+        def change_source(provenance: dict[str, Any]) -> None:
+            inputs = provenance["providers"]["openrouter"]["inputs"]
+            source = next(item for item in inputs if item["kind"] == "source_policy")
+            source["sha256"] = "f" * 64
+
+        candidate = changed_release(self.release, provenance_change=change_source)
+        diff = classify_promotion(self.release, candidate, self.policy)
+        self.assertEqual(diff["decision"], "review_required")
+        self.assertEqual(diff["reasons"], ["source_policy_changed"])
+
     def test_bootstrap_always_requires_review(self) -> None:
         diff = classify_promotion(None, self.release, self.policy)
         self.assertEqual(diff["decision"], "review_required")
@@ -165,6 +182,7 @@ class PromotionTests(unittest.TestCase):
             ("tamper", "canonical JSON"),
             ("extra", "exactly"),
             ("release_id", "does not authenticate"),
+            ("minimum_version", "does not authenticate"),
         ):
             with self.subTest(mutation=mutation), tempfile.TemporaryDirectory() as temporary:
                 candidate = Path(temporary) / "candidate"
@@ -178,7 +196,10 @@ class PromotionTests(unittest.TestCase):
                     else:
                         path = candidate / "manifest-v1.json"
                         manifest = json.loads(path.read_bytes())
-                        manifest["release_id"] = "catalog-v1-20300102t030405z-deadbeefdead"
+                        if mutation == "release_id":
+                            manifest["release_id"] = "catalog-v1-20300102t030405z-" + "d" * 64
+                        else:
+                            manifest["minimum_euler_version"] = "9.9.9"
                         path.write_bytes(canonical_json_bytes(manifest))
                 with self.assertRaisesRegex(CatalogError, message):
                     load_release(candidate)
@@ -207,10 +228,49 @@ class PromotionTests(unittest.TestCase):
             loaded = load_release(stable, stable=True)
             self.assertEqual(loaded.manifest["release_id"], self.release.manifest["release_id"])
 
-            diff["to_release_id"] = "catalog-v1-20300102t030405z-deadbeefdead"
+            diff["to_release_id"] = "catalog-v1-20300102t030405z-" + "d" * 64
             (stable / "diff-v1.json").write_bytes(canonical_json_bytes(diff))
             with self.assertRaisesRegex(CatalogError, "does not identify"):
                 load_release(stable, stable=True)
+
+            diff = classify_promotion(None, self.release, self.policy)
+            del diff["reasons"]
+            (stable / "diff-v1.json").write_bytes(canonical_json_bytes(diff))
+            with self.assertRaisesRegex(CatalogError, "invalid shape"):
+                load_release(stable, stable=True)
+
+    def test_diff_validator_rejects_semantic_tampering(self) -> None:
+        baseline = classify_promotion(None, self.release, self.policy)
+        for mutation, message in (
+            ("decision", "decision disagrees"),
+            ("reasons", "reasons disagree"),
+            ("counts", "model counts disagree"),
+        ):
+            with self.subTest(mutation=mutation):
+                diff = copy.deepcopy(baseline)
+                if mutation == "decision":
+                    diff["decision"] = "no_change"
+                elif mutation == "reasons":
+                    diff["reasons"] = []
+                else:
+                    diff["providers"]["openrouter"]["after_model_count"] += 1
+                with self.assertRaisesRegex(CatalogError, message):
+                    validate_promotion_diff(diff)
+
+    def test_release_loader_rejects_unsafe_provenance_paths(self) -> None:
+        def corrupt_path(provenance: dict[str, Any]) -> None:
+            inputs = provenance["providers"]["openrouter"]["inputs"]
+            observation = next(item for item in inputs if item["kind"] == "official_api")
+            observation["path"] = "../../secrets.json"
+
+        release = changed_release(self.release, provenance_change=corrupt_path)
+        with tempfile.TemporaryDirectory() as temporary:
+            candidate = Path(temporary) / "candidate"
+            candidate.mkdir()
+            for name, data in release.encoded.items():
+                (candidate / name).write_bytes(data)
+            with self.assertRaisesRegex(CatalogError, "provenance input is invalid"):
+                load_release(candidate)
 
     def test_blocked_cli_returns_nonzero_and_retains_the_diff(self) -> None:
         def remove_model(catalog: dict[str, Any]) -> None:
