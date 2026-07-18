@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "provider_id": "openrouter",
+  "reviewed_at": "2026-07-18T00:00:00Z",
+  "membership_policy": "all_observed",
+  "default_model": "openai/gpt-4.1-mini",
+  "aliases": [],
+  "models": [],
+  "additions": [
+    {
+      "id": "openrouter/auto",
+      "display_name": "Auto Router",
+      "status": "active",
+      "context_window_tokens": 2000000,
+      "max_output_tokens": 4096,
+      "supports_tools": true,
+      "supports_reasoning": true,
+      "reasoning_efforts": [
+        "xsmall",
+        "small",
+        "medium",
+        "large",
+        "xlarge"
+      ]
+    },
+    {
+      "id": "openrouter/free",
+      "display_name": "Free Models Router",
+      "status": "active",
+      "context_window_tokens": 200000,
+      "max_output_tokens": 4096,
+      "supports_tools": true,
+      "supports_reasoning": true,
+      "reasoning_efforts": [
+        "xsmall",
+        "small",
+        "medium",
+        "large",
+        "xlarge"
+      ]
+    },
+    {
+      "id": "openrouter/fusion",
+      "display_name": "OpenRouter: Fusion",
+      "status": "active",
+      "context_window_tokens": 1000000,
+      "max_output_tokens": 30000,
+      "supports_tools": true,
+      "supports_reasoning": true,
+      "reasoning_efforts": [
+        "xsmall",
+        "small",
+        "medium",
+        "large",
+        "xlarge"
+      ]
+    }
+  ]
+}

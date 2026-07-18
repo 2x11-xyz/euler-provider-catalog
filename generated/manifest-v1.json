@@ -1,0 +1,16 @@
+{
+  "artifacts": {
+    "catalog-v1.json": {
+      "bytes": 15015,
+      "sha256": "6efcabff1a52a9cb0dafda2a2b3c1bd0722cc5cb52203ba0822a9ab22079ce79"
+    },
+    "provenance-v1.json": {
+      "bytes": 6415,
+      "sha256": "c36dc0b7f84e3eee87e3c5e76b548bff69d377da806e29578b0aa67751722555"
+    }
+  },
+  "generated_at": "2026-07-18T00:00:00Z",
+  "minimum_euler_version": "0.1.1",
+  "release_id": "catalog-v1-20260718t000000z-a7632aa5e2db",
+  "schema_version": 1
+}

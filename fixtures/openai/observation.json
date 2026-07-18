@@ -1,0 +1,14 @@
+{
+  "inputs": [
+    {
+      "bytes": 1252,
+      "endpoint_id": "models",
+      "file": "models.json",
+      "sha256": "9947165979aef0c09909a1caf6f339e71d29b4b95e63fdaa756c823937148e51",
+      "source_url": "https://api.openai.com/v1/models"
+    }
+  ],
+  "observed_at": "2026-07-18T00:00:00Z",
+  "provider_id": "openai",
+  "schema_version": 1
+}
