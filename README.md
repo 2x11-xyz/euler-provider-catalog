@@ -32,6 +32,8 @@ The repository layout keeps those decisions visible:
   provider-specific acceptance rules;
 - `curated/` records defaults and the narrow metadata that APIs do not expose;
 - `catalog_pipeline/` fetches bounded observations and generates artifacts;
+- `bootstrap/` is the reviewed import of Euler's pre-catalog built-ins;
+- `stable/` is the sole release input and changes only through pull requests;
 - `promotion-policy.json` owns the reviewed catalog-shrink threshold;
 - `schema/` defines the runtime, evidence, and promotion formats;
 - `fixtures/` contains deterministic multi-provider upstream evidence;
@@ -92,18 +94,57 @@ The classifier validates the internal integrity of both releases, emits a determ
 always classified as requiring human review. The classifier never writes to
 `stable/`.
 
+The historical bootstrap release can be reproduced without a network call:
+
+```console
+python -m catalog_pipeline.bootstrap --output-dir /tmp/bootstrap-candidate
+python -m catalog_pipeline.verify_release \
+  --directory /tmp/bootstrap-candidate
+```
+
+That self-contained baseline is an exact, reviewed import of the model
+membership embedded in Euler at the source revision named by
+`bootstrap/metadata-v1.json`. Its provenance explicitly claims no live
+provider observation. It exists so a fresh or offline Euler install has a real
+last-known-good catalog while daily official-source observations take over
+future updates. `stable/` initially matches it and then advances independently
+through reviewed promotion pull requests.
+
 ## Publication model
 
 GitHub Actions observes all four official discovery APIs daily and on manual
 dispatch, then combines those observations with the reviewed ChatGPT route
-list. Phase one retains the bounded response observations and generated
-candidate as a workflow artifact. Promotion pull requests and GitHub Release
-publication are the next implementation phase; the workflow does not mutate
-the stable catalog yet.
+list. A successful run retains the bounded evidence and candidate as a
+short-lived workflow artifact. A separate `workflow_run` job has no provider
+credentials: it validates that artifact, applies the promotion policy, and
+updates one monotonic bot-owned branch under `stable/`. A no-change observation
+does nothing, and a blocked or incomplete candidate cannot update the branch.
+
+The organization policy intentionally prevents `GITHUB_TOKEN` from creating or
+approving pull requests. The promotion job therefore dispatches CI against the
+exact bot commit and opens or updates one tracking issue with GitHub's compare
+link. A maintainer creates and merges the PR from that link; publication closes
+the notice. There is no long-lived bot token and no API-to-release path that
+bypasses the stable-state diff.
 
 The retention step also runs after an observation or generation failure so
 maintainers can inspect partial, already-projected evidence. Partial artifacts
 are debugging evidence only and are never eligible for promotion.
+
+Only a merged `stable/` change on `main` starts publication. The workflow
+revalidates the repository, creates a draft GitHub Release named by the
+content-authenticated `manifest.release_id`, uploads the three runtime
+artifacts, downloads and verifies them, and only then publishes the release as
+`latest`. A matching interrupted draft is safely resumed; published tags and
+releases are never overwritten. Repository release immutability must remain
+enabled.
+
+Euler resolves the small latest manifest from
+`releases/latest/download/manifest-v1.json`, then fetches the catalog from the
+manifest's release-specific URL. The release-specific hop makes a moving
+`latest` pointer harmless: the bytes still have to match the selected
+manifest. Euler packages the current stable snapshot and treats network
+refresh as a best-effort update, never as a startup dependency.
 
 The OpenAI and xAI observations are publication-safe projections of their
 official responses: only provider-owned model records are written to disk.

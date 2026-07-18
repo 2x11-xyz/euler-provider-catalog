@@ -1,0 +1,157 @@
+{
+  "generated_at": "2026-07-18T22:16:17Z",
+  "generator": {
+    "name": "euler-provider-catalog",
+    "version": "0.1.0"
+  },
+  "providers": {
+    "anthropic": {
+      "curated_model_count": 0,
+      "discovery_kind": "bootstrap",
+      "documentation_urls": [
+        "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview",
+        "https://platform.claude.com/docs/en/api/models/list"
+      ],
+      "inputs": [
+        {
+          "bytes": 142980,
+          "kind": "bootstrap",
+          "path": "bootstrap/catalog-v1.json",
+          "sha256": "0c791bd6d84b4f180ac569d91258f76b09bd89625f7d8df55a7e6198aaf740a4"
+        },
+        {
+          "bytes": 1194,
+          "kind": "bootstrap",
+          "path": "bootstrap/metadata-v1.json",
+          "sha256": "172b2cbf0c2fb5b774cd4761c1613f6172cad9f672d5cc26aaed65dcf2bbfaad"
+        }
+      ],
+      "observed_at": "2026-07-18T22:16:17Z",
+      "observed_model_count": 0,
+      "published_model_count": 14,
+      "skipped": {},
+      "warnings": [
+        "initial catalog imported from reviewed Euler built-ins at a2858905066e90f1c4a7e642c1117399d9a0c10d; no provider API observation is claimed"
+      ]
+    },
+    "chatgpt": {
+      "curated_model_count": 0,
+      "discovery_kind": "bootstrap",
+      "documentation_urls": [
+        "https://developers.openai.com/codex/models"
+      ],
+      "inputs": [
+        {
+          "bytes": 142980,
+          "kind": "bootstrap",
+          "path": "bootstrap/catalog-v1.json",
+          "sha256": "0c791bd6d84b4f180ac569d91258f76b09bd89625f7d8df55a7e6198aaf740a4"
+        },
+        {
+          "bytes": 1194,
+          "kind": "bootstrap",
+          "path": "bootstrap/metadata-v1.json",
+          "sha256": "172b2cbf0c2fb5b774cd4761c1613f6172cad9f672d5cc26aaed65dcf2bbfaad"
+        }
+      ],
+      "observed_at": "2026-07-18T22:16:17Z",
+      "observed_model_count": 0,
+      "published_model_count": 7,
+      "skipped": {},
+      "warnings": [
+        "initial catalog imported from reviewed Euler built-ins at a2858905066e90f1c4a7e642c1117399d9a0c10d; no provider API observation is claimed"
+      ]
+    },
+    "openai": {
+      "curated_model_count": 0,
+      "discovery_kind": "bootstrap",
+      "documentation_urls": [
+        "https://developers.openai.com/api/docs/models",
+        "https://platform.openai.com/docs/api-reference/models/list"
+      ],
+      "inputs": [
+        {
+          "bytes": 142980,
+          "kind": "bootstrap",
+          "path": "bootstrap/catalog-v1.json",
+          "sha256": "0c791bd6d84b4f180ac569d91258f76b09bd89625f7d8df55a7e6198aaf740a4"
+        },
+        {
+          "bytes": 1194,
+          "kind": "bootstrap",
+          "path": "bootstrap/metadata-v1.json",
+          "sha256": "172b2cbf0c2fb5b774cd4761c1613f6172cad9f672d5cc26aaed65dcf2bbfaad"
+        }
+      ],
+      "observed_at": "2026-07-18T22:16:17Z",
+      "observed_model_count": 0,
+      "published_model_count": 45,
+      "skipped": {},
+      "warnings": [
+        "initial catalog imported from reviewed Euler built-ins at a2858905066e90f1c4a7e642c1117399d9a0c10d; no provider API observation is claimed"
+      ]
+    },
+    "openrouter": {
+      "curated_model_count": 0,
+      "discovery_kind": "bootstrap",
+      "documentation_urls": [
+        "https://openrouter.ai/docs/api/api-reference/models/get-models"
+      ],
+      "inputs": [
+        {
+          "bytes": 142980,
+          "kind": "bootstrap",
+          "path": "bootstrap/catalog-v1.json",
+          "sha256": "0c791bd6d84b4f180ac569d91258f76b09bd89625f7d8df55a7e6198aaf740a4"
+        },
+        {
+          "bytes": 1194,
+          "kind": "bootstrap",
+          "path": "bootstrap/metadata-v1.json",
+          "sha256": "172b2cbf0c2fb5b774cd4761c1613f6172cad9f672d5cc26aaed65dcf2bbfaad"
+        }
+      ],
+      "observed_at": "2026-07-18T22:16:17Z",
+      "observed_model_count": 0,
+      "published_model_count": 270,
+      "skipped": {},
+      "warnings": [
+        "initial catalog imported from reviewed Euler built-ins at a2858905066e90f1c4a7e642c1117399d9a0c10d; no provider API observation is claimed"
+      ]
+    },
+    "xai": {
+      "curated_model_count": 0,
+      "discovery_kind": "bootstrap",
+      "documentation_urls": [
+        "https://docs.x.ai/developers/migration/may-15-retirement",
+        "https://docs.x.ai/developers/model-capabilities/text/reasoning",
+        "https://docs.x.ai/developers/models",
+        "https://docs.x.ai/developers/rest-api-reference/inference/models",
+        "https://docs.x.ai/developers/tools/function-calling"
+      ],
+      "inputs": [
+        {
+          "bytes": 142980,
+          "kind": "bootstrap",
+          "path": "bootstrap/catalog-v1.json",
+          "sha256": "0c791bd6d84b4f180ac569d91258f76b09bd89625f7d8df55a7e6198aaf740a4"
+        },
+        {
+          "bytes": 1194,
+          "kind": "bootstrap",
+          "path": "bootstrap/metadata-v1.json",
+          "sha256": "172b2cbf0c2fb5b774cd4761c1613f6172cad9f672d5cc26aaed65dcf2bbfaad"
+        }
+      ],
+      "observed_at": "2026-07-18T22:16:17Z",
+      "observed_model_count": 0,
+      "published_model_count": 8,
+      "skipped": {},
+      "warnings": [
+        "initial catalog imported from reviewed Euler built-ins at a2858905066e90f1c4a7e642c1117399d9a0c10d; no provider API observation is claimed"
+      ]
+    }
+  },
+  "schema_version": 1
+}

@@ -32,6 +32,12 @@ class SchemaTests(unittest.TestCase):
                 )
                 self._validator(f"{stem}.schema.json").validate(document)
 
+    def test_stable_release_artifacts_conform_to_their_schemas(self) -> None:
+        for stem in ("catalog-v1", "manifest-v1", "provenance-v1", "diff-v1"):
+            with self.subTest(artifact=stem):
+                document = json.loads((ROOT / "stable" / f"{stem}.json").read_bytes())
+                self._validator(f"{stem}.schema.json").validate(document)
+
     def test_observation_sidecars_conform_to_their_schema(self) -> None:
         validator = self._validator("observation-v1.schema.json")
         for provider_id in ("anthropic", "openai", "openrouter", "xai"):

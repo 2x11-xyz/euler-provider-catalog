@@ -5,6 +5,7 @@ import json
 import shutil
 import tempfile
 import unittest
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Callable
 from unittest.mock import patch
@@ -32,7 +33,9 @@ def changed_release(
     base: ReleaseArtifacts,
     *,
     catalog_change: Callable[[dict[str, Any]], None] | None = None,
+    manifest_change: Callable[[dict[str, Any]], None] | None = None,
     provenance_change: Callable[[dict[str, Any]], None] | None = None,
+    advance_timestamp: bool = True,
 ) -> ReleaseArtifacts:
     catalog = copy.deepcopy(base.catalog)
     provenance = copy.deepcopy(base.provenance)
@@ -41,6 +44,14 @@ def changed_release(
         catalog_change(catalog)
     if provenance_change:
         provenance_change(provenance)
+    if manifest_change:
+        manifest_change(manifest)
+    if advance_timestamp and (catalog_change or provenance_change or manifest_change):
+        generated_at = datetime.fromisoformat(manifest["generated_at"][:-1] + "+00:00")
+        generated_at += timedelta(seconds=1)
+        timestamp = generated_at.isoformat().replace("+00:00", "Z")
+        manifest["generated_at"] = timestamp
+        provenance["generated_at"] = timestamp
     catalog_bytes = canonical_json_bytes(catalog)
     provenance_bytes = canonical_json_bytes(provenance)
     manifest["artifacts"] = {
@@ -170,6 +181,34 @@ class PromotionTests(unittest.TestCase):
         diff = classify_promotion(self.release, candidate, self.policy)
         self.assertEqual(diff["decision"], "review_required")
         self.assertEqual(diff["reasons"], ["source_policy_changed"])
+
+    def test_minimum_euler_version_change_requires_review(self) -> None:
+        def change_version(manifest: dict[str, Any]) -> None:
+            manifest["minimum_euler_version"] = "0.2.0"
+
+        candidate = changed_release(self.release, manifest_change=change_version)
+        diff = classify_promotion(self.release, candidate, self.policy)
+        self.assertEqual(diff["decision"], "review_required")
+        self.assertEqual(diff["reasons"], ["minimum_euler_version_changed"])
+        self.assertEqual(diff["from_minimum_euler_version"], "0.1.1")
+        self.assertEqual(diff["to_minimum_euler_version"], "0.2.0")
+
+    def test_non_monotonic_changed_release_is_blocked(self) -> None:
+        def add_model(catalog: dict[str, Any]) -> None:
+            provider = catalog["providers"]["openrouter"]
+            model = copy.deepcopy(provider["models"][0])
+            model["id"] = "example/stale-model"
+            provider["models"].append(model)
+            provider["models"].sort(key=lambda item: item["id"])
+
+        candidate = changed_release(
+            self.release,
+            catalog_change=add_model,
+            advance_timestamp=False,
+        )
+        diff = classify_promotion(self.release, candidate, self.policy)
+        self.assertEqual(diff["decision"], "blocked")
+        self.assertIn("non_monotonic_release", diff["reasons"])
 
     def test_bootstrap_always_requires_review(self) -> None:
         diff = classify_promotion(None, self.release, self.policy)
