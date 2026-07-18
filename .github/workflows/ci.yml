@@ -39,3 +39,8 @@ jobs:
           --observations-dir fixtures
           --output-dir fixtures/expected
           --check
+      - name: Exercise guarded bootstrap classification
+        run: >-
+          python -m catalog_pipeline.promotion
+          --candidate-dir fixtures/expected
+          --output-dir /tmp/promotion-review

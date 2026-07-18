@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -9,6 +10,7 @@ from typing import Any
 from . import __version__
 from .common import (
     CatalogError,
+    catalog_release_id,
     canonical_json_bytes,
     sha256_hex,
     validate_model,
@@ -143,23 +145,27 @@ def generate_artifacts(
     }
     catalog_bytes = canonical_json_bytes(catalog)
     provenance_bytes = canonical_json_bytes(provenance)
-    timestamp = _timestamp_key(generated_at).strftime("%Y%m%dt%H%M%Sz").lower()
-    release_digest = sha256_hex(catalog_bytes + provenance_bytes)[:12]
+    minimum_euler_version = max(minimum_versions, key=_version_key)
+    manifest_artifacts = {
+        "catalog-v1.json": {
+            "bytes": len(catalog_bytes),
+            "sha256": sha256_hex(catalog_bytes),
+        },
+        "provenance-v1.json": {
+            "bytes": len(provenance_bytes),
+            "sha256": sha256_hex(provenance_bytes),
+        },
+    }
     manifest = {
         "schema_version": 1,
-        "release_id": f"catalog-v1-{timestamp}-{release_digest}",
+        "release_id": catalog_release_id(
+            generated_at=generated_at,
+            minimum_euler_version=minimum_euler_version,
+            artifacts=manifest_artifacts,
+        ),
         "generated_at": generated_at,
-        "minimum_euler_version": max(minimum_versions, key=_version_key),
-        "artifacts": {
-            "catalog-v1.json": {
-                "bytes": len(catalog_bytes),
-                "sha256": sha256_hex(catalog_bytes),
-            },
-            "provenance-v1.json": {
-                "bytes": len(provenance_bytes),
-                "sha256": sha256_hex(provenance_bytes),
-            },
-        },
+        "minimum_euler_version": minimum_euler_version,
+        "artifacts": manifest_artifacts,
     }
     documents = {
         "catalog-v1.json": catalog,
@@ -194,7 +200,7 @@ def main() -> int:
         )
         write_or_check(args.output_dir, artifacts.encoded, check=args.check)
     except CatalogError as error:
-        print(f"catalog generation failed: {error}")
+        print(f"catalog generation failed: {error}", file=sys.stderr)
         return 1
     action = "verified" if args.check else "generated"
     print(f"{action} {len(artifacts.encoded)} centralized catalog artifacts")

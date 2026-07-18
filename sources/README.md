@@ -16,6 +16,20 @@ APIs do not expose equivalent contracts:
 - ChatGPT subscription routing has no suitable unattended public list API and
   is therefore review-only.
 
+Discovery is classified per provider:
+
+- OpenRouter uses an official unauthenticated API.
+- Anthropic, OpenAI, and xAI use official authenticated APIs. Authentication is
+  supplied only to the observation job as a dedicated read-only discovery
+  credential; it is not an Euler user secret and never becomes artifact data.
+- ChatGPT is curated from official documentation because there is no suitable
+  unattended list API.
+
+Avoiding discovery credentials for every provider would require either brittle
+documentation scraping or a secondary source. Both are deliberately excluded;
+without an authenticated discovery credential, that provider cannot produce a
+complete automated candidate.
+
 Human-readable pages back structured review but are never scraped to mutate a
 stable catalog. An unknown or incomplete API record is skipped with provenance,
 not filled by an undocumented guess.

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/2x11-xyz/euler-provider-catalog/main/schema/promotion-policy-v1.schema.json",
+  "title": "Euler provider catalog promotion policy v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "maximum_shrink_basis_points"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "maximum_shrink_basis_points": {
+      "description": "Maximum fraction of a provider's prior model IDs that may disappear before promotion is blocked, in hundredths of one percent.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000
+    }
+  }
+}

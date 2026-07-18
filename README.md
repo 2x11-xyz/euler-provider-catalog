@@ -32,7 +32,8 @@ The repository layout keeps those decisions visible:
   provider-specific acceptance rules;
 - `curated/` records defaults and the narrow metadata that APIs do not expose;
 - `catalog_pipeline/` fetches bounded observations and generates artifacts;
-- `schema/` defines the catalog, manifest, provenance, and observation formats;
+- `promotion-policy.json` owns the reviewed catalog-shrink threshold;
+- `schema/` defines the runtime, evidence, and promotion formats;
 - `fixtures/` contains deterministic multi-provider upstream evidence;
 - `fixtures/expected/` is the byte-for-byte expected centralized output for
   the checked-in fixtures. It is test data, never a release source.
@@ -68,6 +69,29 @@ python -m catalog_pipeline.generate \
   --output-dir candidate
 ```
 
+Those keys are catalog-operator discovery credentials, not Euler user
+credentials and not catalog data. They are injected into the observation
+process, used only in request headers for official read-only model-list calls,
+and never written to observations, provenance, candidates, releases, or the
+Euler client. Providers without a suitable unauthenticated official endpoint
+must otherwise remain explicitly curated from official documentation; the
+pipeline does not fall back to scraping or secondary indexes.
+
+Classify a complete candidate against the current stable release:
+
+```console
+python -m catalog_pipeline.promotion \
+  --candidate-dir candidate \
+  --previous-dir stable \
+  --output-dir promotion-review
+```
+
+The classifier validates the internal integrity of both releases, emits a deterministic
+`diff-v1.json`, and returns a nonzero status for a blocked candidate. Omit
+`--previous-dir` only when preparing the first stable baseline; bootstrap is
+always classified as requiring human review. The classifier never writes to
+`stable/`.
+
 ## Publication model
 
 GitHub Actions observes all four official discovery APIs daily and on manual
@@ -88,6 +112,10 @@ uploaded from this public repository's workflow.
 
 Euler remains usable from its embedded last-known-good catalog when GitHub or
 an upstream provider is unavailable.
+
+Artifact hashes and release IDs detect inconsistent or corrupted release
+content. They do not create a trust root independent of the official GitHub
+repository; repository controls and reviewed publication remain the authority.
 
 ## License
 
