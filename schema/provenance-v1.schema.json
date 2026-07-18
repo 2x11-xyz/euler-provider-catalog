@@ -61,7 +61,8 @@
         "discovery_kind": {
           "enum": [
             "official_api",
-            "curated"
+            "curated",
+            "bootstrap"
           ]
         },
         "documentation_urls": {
@@ -129,6 +130,7 @@
         "kind": {
           "enum": [
             "official_api",
+            "bootstrap",
             "curated",
             "source_policy"
           ]

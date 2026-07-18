@@ -25,6 +25,7 @@ MODEL_METADATA_FIELDS = tuple(
 )
 PROVIDER_ID_PATTERN = re.compile(r"^[a-z][a-z0-9-]{0,63}$")
 RELEASE_ID_PATTERN = re.compile(r"^catalog-v1-[0-9]{8}t[0-9]{6}z-[a-f0-9]{64}$")
+VERSION_PATTERN = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+$")
 
 
 class CatalogError(ValueError):
@@ -104,6 +105,13 @@ def validate_timestamp(value: Any, scope: str) -> str:
     except ValueError as error:
         raise CatalogError(f"{scope} is not an RFC 3339 timestamp") from error
     return timestamp
+
+
+def validate_version(value: Any, scope: str) -> str:
+    version = require_string(value, scope)
+    if not VERSION_PATTERN.fullmatch(version):
+        raise CatalogError(f"{scope} is not a numeric major.minor.patch version")
+    return version
 
 
 def validate_model_id(value: Any, maximum_bytes: int, scope: str) -> str:

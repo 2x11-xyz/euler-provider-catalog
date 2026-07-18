@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -44,3 +45,9 @@ jobs:
           python -m catalog_pipeline.promotion
           --candidate-dir fixtures/expected
           --output-dir /tmp/promotion-review
+      - name: Rebuild and verify reviewed bootstrap
+        run: |
+          python -m catalog_pipeline.bootstrap --output-dir /tmp/bootstrap-candidate
+          python -m catalog_pipeline.verify_release --directory /tmp/bootstrap-candidate
+      - name: Verify stable release state
+        run: python -m catalog_pipeline.verify_release --directory stable --stable

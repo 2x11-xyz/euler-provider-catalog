@@ -21,9 +21,10 @@ observations. They are not a production catalog and must never be released.
 
 ## Phase 2: guarded promotion and GitHub Releases
 
-Status: promotion classification is implemented. Stable-state writes, bot pull
-requests, removal-history enforcement, and release publication remain gated on
-the repository prerequisites below and a reviewed first live baseline.
+Status: implemented. The reviewed first stable baseline is an exact import of
+Euler's pre-catalog built-ins, bot promotion-branch preparation is privilege
+separated from provider observation, and merged stable state is published as a
+verified GitHub Release.
 
 The classifier authenticates canonical candidate and stable artifacts, records
 model/provider/governed-input changes in `diff-v1.json`, separates addition-only
@@ -45,9 +46,11 @@ or below that threshold still requires human review.
    `OPENROUTER_API_KEY` remains optional.
 4. Restrict each credential to model reads when the provider supports endpoint
    permissions. Otherwise use an isolated project with a minimal spend limit.
-5. Install a narrowly scoped GitHub App for bot branches and pull requests.
-   Pull requests created with the repository `GITHUB_TOKEN` do not reliably
-   trigger the independent CI run required for protected promotion.
+5. Keep Actions allowed to create branches and issues. Organization policy
+   prevents `GITHUB_TOKEN` from creating or approving pull requests, so the
+   workflow explicitly dispatches CI for its bot commit and maintains one issue
+   with the compare link. A GitHub App is not required and no long-lived bot
+   credential is introduced.
 
 These are catalog-operator credentials, never Euler user credentials or
 published catalog content. The repository stores only their GitHub secret
@@ -59,7 +62,7 @@ discovery.
 
 ### Stable state
 
-Add a `stable/` directory containing exactly:
+The `stable/` directory contains exactly:
 
 - `catalog-v1.json`;
 - `manifest-v1.json`;
@@ -73,15 +76,15 @@ accumulate on `main`.
 ### Candidate classification
 
 Compare each complete candidate with `stable/catalog-v1.json` and classify it
-before creating or updating one bot pull request:
+before updating the bot branch and its single promotion notice:
 
 | Change | Initial policy |
 |---|---|
 | No byte change | Do nothing |
-| Model addition | Bot PR; eligible for auto-merge after an operating soak period |
-| Display name, limits, or capability change | Bot PR; human review initially |
-| Model deprecation | Bot PR; human review |
-| Model removal | Human review and either three consecutive observations or explicit override |
+| Model addition | Bot branch; maintainer-created PR and merge |
+| Display name, limits, or capability change | Bot branch; human review |
+| Model deprecation | Bot branch; human review |
+| Model removal | Human review; merging is the explicit override |
 | Default, provider set, source policy, schema, or workflow change | Human review required |
 | Missing provider, digest failure, excessive shrink, or count outside bounds | Fail closed; no PR |
 
@@ -92,10 +95,12 @@ tests enforce the classification; prose labels alone are not a guard.
 ### Release publication
 
 Only a merged change under `stable/` may publish. A separate workflow reruns
-all validation, creates an immutable tag from `manifest.release_id`, and
-uploads the three runtime artifacts as GitHub Release assets. It must refuse to
-overwrite an existing tag or release and verify the downloaded assets before
-marking the release successful.
+all validation, creates a tag from `manifest.release_id`, uploads the three
+runtime artifacts to a draft GitHub Release, downloads and verifies those
+assets, and then publishes it as `latest`. It refuses to overwrite an existing
+tag or published release, while a matching interrupted draft can be resumed.
+GitHub's repository-level immutable-release setting makes a published release
+append-only.
 
 ## Phase 3: Euler consumption
 

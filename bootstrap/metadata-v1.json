@@ -1,0 +1,32 @@
+{
+  "generator_version": "0.1.0",
+  "minimum_euler_version": "0.1.1",
+  "provider_documentation_urls": {
+    "anthropic": [
+      "https://platform.claude.com/docs/en/about-claude/models/overview",
+      "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview",
+      "https://platform.claude.com/docs/en/api/models/list"
+    ],
+    "chatgpt": [
+      "https://developers.openai.com/codex/models"
+    ],
+    "openai": [
+      "https://developers.openai.com/api/docs/models",
+      "https://platform.openai.com/docs/api-reference/models/list"
+    ],
+    "openrouter": [
+      "https://openrouter.ai/docs/api/api-reference/models/get-models"
+    ],
+    "xai": [
+      "https://docs.x.ai/developers/migration/may-15-retirement",
+      "https://docs.x.ai/developers/model-capabilities/text/reasoning",
+      "https://docs.x.ai/developers/models",
+      "https://docs.x.ai/developers/rest-api-reference/inference/models",
+      "https://docs.x.ai/developers/tools/function-calling"
+    ]
+  },
+  "reviewed_at": "2026-07-18T22:16:17Z",
+  "schema_version": 1,
+  "source_repository": "https://github.com/2x11-xyz/euler",
+  "source_revision": "a2858905066e90f1c4a7e642c1117399d9a0c10d"
+}

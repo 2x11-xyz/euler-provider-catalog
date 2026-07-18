@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -16,6 +17,8 @@ from .common import (
     require_object,
     sha256_hex,
     validate_model_id,
+    validate_timestamp,
+    validate_version,
 )
 
 
@@ -28,6 +31,8 @@ REASONS = {
     "model_lifecycle_changed",
     "model_metadata_changed",
     "model_removal",
+    "minimum_euler_version_changed",
+    "non_monotonic_release",
     "provider_metadata_changed",
     "provider_set_changed",
     "source_policy_changed",
@@ -65,9 +70,18 @@ def shrink_basis_points(before_count: int, removed_count: int) -> int:
 
 
 def promotion_reasons(
-    providers: dict[str, dict[str, Any]], *, bootstrap: bool, maximum_shrink_basis_points: int
+    providers: dict[str, dict[str, Any]],
+    *,
+    bootstrap: bool,
+    maximum_shrink_basis_points: int,
+    minimum_version_changed: bool = False,
+    non_monotonic_release: bool = False,
 ) -> set[str]:
     reasons: set[str] = {"bootstrap"} if bootstrap else set()
+    if minimum_version_changed:
+        reasons.add("minimum_euler_version_changed")
+    if non_monotonic_release:
+        reasons.add("non_monotonic_release")
     for change in providers.values():
         if (change["before_model_count"] == 0) != (change["after_model_count"] == 0):
             reasons.add("provider_set_changed")
@@ -93,7 +107,7 @@ def promotion_reasons(
 def promotion_decision(reasons: set[str], *, bootstrap: bool) -> str:
     if not reasons:
         return "no_change"
-    if "excessive_shrink" in reasons:
+    if reasons & {"excessive_shrink", "non_monotonic_release"}:
         return "blocked"
     if not bootstrap and reasons == {"model_addition"}:
         return "addition_only"
@@ -218,12 +232,16 @@ def validate_promotion_diff(
     diff = require_object(value, "diff-v1.json")
     expected = {
         "decision",
+        "from_generated_at",
+        "from_minimum_euler_version",
         "from_release_id",
         "promotion_policy",
         "providers",
         "reasons",
         "schema_version",
         "to_release_id",
+        "to_generated_at",
+        "to_minimum_euler_version",
     }
     if set(diff) != expected or diff["schema_version"] != 1:
         raise CatalogError("promotion diff has an invalid shape")
@@ -237,6 +255,16 @@ def validate_promotion_diff(
         raise CatalogError("promotion diff to_release_id is invalid")
     if expected_to_release_id is not None and to_release_id != expected_to_release_id:
         raise CatalogError("stable diff does not identify its release")
+    from_generated_at = diff["from_generated_at"]
+    from_version = diff["from_minimum_euler_version"]
+    if from_release_id is None:
+        if from_generated_at is not None or from_version is not None:
+            raise CatalogError("bootstrap diff has invalid previous release metadata")
+    else:
+        validate_timestamp(from_generated_at, "diff.from_generated_at")
+        validate_version(from_version, "diff.from_minimum_euler_version")
+    to_generated_at = validate_timestamp(diff["to_generated_at"], "diff.to_generated_at")
+    to_version = validate_version(diff["to_minimum_euler_version"], "diff.to_minimum_euler_version")
     policy = require_object(diff["promotion_policy"], "diff.promotion_policy")
     if set(policy) != {"sha256", "maximum_shrink_basis_points"}:
         raise CatalogError("promotion diff policy has an invalid shape")
@@ -255,10 +283,19 @@ def validate_promotion_diff(
         providers[provider_id] = _validate_provider_diff(provider_id, provider)
     reasons = _enum_list(diff["reasons"], REASONS, "diff.reasons")
     bootstrap = from_release_id is None
+    minimum_version_changed = not bootstrap and from_version != to_version
+    non_monotonic_release = (
+        not bootstrap
+        and from_release_id != to_release_id
+        and datetime.fromisoformat(to_generated_at[:-1] + "+00:00")
+        <= datetime.fromisoformat(from_generated_at[:-1] + "+00:00")
+    )
     expected_reasons = promotion_reasons(
         providers,
         bootstrap=bootstrap,
         maximum_shrink_basis_points=maximum,
+        minimum_version_changed=minimum_version_changed,
+        non_monotonic_release=non_monotonic_release,
     )
     if set(reasons) != expected_reasons:
         raise CatalogError("promotion diff reasons disagree with provider changes")

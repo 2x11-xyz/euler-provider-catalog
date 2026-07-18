@@ -19,6 +19,7 @@ from .common import (
     validate_model,
     validate_model_id,
     validate_timestamp,
+    validate_version,
 )
 from .promotion_contract import validate_promotion_diff
 
@@ -29,7 +30,6 @@ MODEL_LIMITS = {
     "maximum_display_name_bytes": 256,
     "maximum_token_limit": 20_000_000,
 }
-VERSION_PATTERN = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+$")
 
 
 @dataclass(frozen=True)
@@ -53,6 +53,8 @@ def _valid_provenance_path(path: str, provider_id: str, kind: str) -> bool:
         return path == f"sources/{provider_id}.json"
     if kind == "curated":
         return path == f"curated/{provider_id}.json"
+    if kind == "bootstrap":
+        return path in {"bootstrap/catalog-v1.json", "bootstrap/metadata-v1.json"}
     return len(parsed.parts) == 3 and parsed.parts[:2] == ("observations", provider_id)
 
 
@@ -77,9 +79,7 @@ def _validate_manifest(manifest: dict[str, Any]) -> None:
     if not RELEASE_ID_PATTERN.fullmatch(release_id):
         raise CatalogError("manifest.release_id is invalid")
     validate_timestamp(manifest["generated_at"], "manifest.generated_at")
-    version = require_string(manifest["minimum_euler_version"], "minimum_euler_version")
-    if not VERSION_PATTERN.fullmatch(version):
-        raise CatalogError("manifest.minimum_euler_version is invalid")
+    validate_version(manifest["minimum_euler_version"], "manifest.minimum_euler_version")
     artifacts = require_object(manifest["artifacts"], "manifest.artifacts")
     if set(artifacts) != {"catalog-v1.json", "provenance-v1.json"}:
         raise CatalogError("manifest artifacts are incomplete")
@@ -100,7 +100,7 @@ def _validate_manifest(manifest: dict[str, Any]) -> None:
             raise CatalogError(f"manifest.artifacts.{name} metadata is invalid")
 
 
-def _validate_catalog(catalog: dict[str, Any]) -> None:
+def validate_catalog(catalog: dict[str, Any]) -> None:
     if set(catalog) != {"schema_version", "providers"} or catalog["schema_version"] != 1:
         raise CatalogError("release catalog has an invalid shape")
     providers = require_object(catalog["providers"], "catalog.providers")
@@ -177,7 +177,8 @@ def _validate_provenance(
         }
         if set(provider) != expected:
             raise CatalogError(f"{provider_id} provenance has an invalid shape")
-        if provider["discovery_kind"] not in {"official_api", "curated"}:
+        discovery_kind = provider["discovery_kind"]
+        if discovery_kind not in {"official_api", "curated", "bootstrap"}:
             raise CatalogError(f"{provider_id} provenance discovery kind is invalid")
         documentation = require_array(
             provider["documentation_urls"],
@@ -202,6 +203,7 @@ def _validate_provenance(
         if not 0 < len(inputs) <= 16:
             raise CatalogError(f"{provider_id} provenance input count is invalid")
         kinds = []
+        input_paths: list[str] = []
         for index, value in enumerate(inputs):
             entry = require_object(value, f"provenance.providers.{provider_id}.inputs[{index}]")
             required_input = {"kind", "path", "bytes", "sha256"}
@@ -213,7 +215,7 @@ def _validate_provenance(
             byte_count = entry["bytes"]
             digest = entry["sha256"]
             invalid = (
-                kind not in {"official_api", "curated", "source_policy"}
+                kind not in {"official_api", "bootstrap", "curated", "source_policy"}
                 or ("source_url" in entry) != (kind == "official_api")
                 or not isinstance(entry["path"], str)
                 or not entry["path"]
@@ -235,8 +237,38 @@ def _validate_provenance(
             if invalid:
                 raise CatalogError(f"{provider_id} provenance input is invalid")
             kinds.append(kind)
-        if kinds.count("source_policy") != 1 or kinds.count("curated") != 1:
-            raise CatalogError(f"{provider_id} provenance lacks unique governed inputs")
+            input_paths.append(entry["path"])
+        if len(input_paths) != len(set(input_paths)):
+            raise CatalogError(f"{provider_id} provenance input paths are duplicated")
+        discovery_inputs_are_invalid = (
+            (
+                discovery_kind == "official_api"
+                and (
+                    kinds.count("official_api") < 1
+                    or kinds.count("source_policy") != 1
+                    or kinds.count("curated") != 1
+                    or "bootstrap" in kinds
+                )
+            )
+            or (
+                discovery_kind == "curated"
+                and (
+                    kinds.count("source_policy") != 1
+                    or kinds.count("curated") != 1
+                    or any(kind in kinds for kind in ("official_api", "bootstrap"))
+                )
+            )
+            or (
+                discovery_kind == "bootstrap"
+                and (
+                    kinds != ["bootstrap", "bootstrap"]
+                    or set(input_paths)
+                    != {"bootstrap/catalog-v1.json", "bootstrap/metadata-v1.json"}
+                )
+            )
+        )
+        if discovery_inputs_are_invalid:
+            raise CatalogError(f"{provider_id} provenance discovery inputs are inconsistent")
         skipped = require_object(provider["skipped"], f"{provider_id}.skipped")
         invalid_skipped = any(
             not isinstance(reason, str)
@@ -282,7 +314,7 @@ def load_release(directory: Path, *, stable: bool = False) -> ReleaseArtifacts:
         raw = encoded[name]
         if metadata["bytes"] != len(raw) or metadata["sha256"] != sha256_hex(raw):
             raise CatalogError(f"{directory}/{name} does not match its manifest digest")
-    _validate_catalog(catalog)
+    validate_catalog(catalog)
     _validate_provenance(provenance, catalog, manifest)
     expected_release_id = catalog_release_id(
         generated_at=manifest["generated_at"],

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +23,8 @@ def _governed_digest(release: ReleaseArtifacts, provider_id: str, kind: str) -> 
     if provider is None:
         return None
     matches = [entry["sha256"] for entry in provider["inputs"] if entry["kind"] == kind]
+    if not matches:
+        return None
     if len(matches) != 1:
         raise CatalogError(f"{provider_id} provenance has ambiguous {kind} input")
     return matches[0]
@@ -97,16 +100,32 @@ def classify_promotion(
         for provider_id in provider_ids
     }
     bootstrap = previous is None
+    minimum_version_changed = previous is not None and (
+        previous.manifest["minimum_euler_version"] != candidate.manifest["minimum_euler_version"]
+    )
+    non_monotonic_release = previous is not None and (
+        previous.manifest["release_id"] != candidate.manifest["release_id"]
+        and datetime.fromisoformat(candidate.manifest["generated_at"][:-1] + "+00:00")
+        <= datetime.fromisoformat(previous.manifest["generated_at"][:-1] + "+00:00")
+    )
     reasons = promotion_reasons(
         providers,
         bootstrap=bootstrap,
         maximum_shrink_basis_points=policy.maximum_shrink_basis_points,
+        minimum_version_changed=minimum_version_changed,
+        non_monotonic_release=non_monotonic_release,
     )
     decision = promotion_decision(reasons, bootstrap=bootstrap)
     diff = {
         "schema_version": 1,
         "from_release_id": previous.manifest["release_id"] if previous else None,
+        "from_generated_at": previous.manifest["generated_at"] if previous else None,
+        "from_minimum_euler_version": (
+            previous.manifest["minimum_euler_version"] if previous else None
+        ),
         "to_release_id": candidate.manifest["release_id"],
+        "to_generated_at": candidate.manifest["generated_at"],
+        "to_minimum_euler_version": candidate.manifest["minimum_euler_version"],
         "decision": decision,
         "reasons": sorted(reasons),
         "promotion_policy": {
