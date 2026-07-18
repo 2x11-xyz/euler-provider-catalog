@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.0.0
+        with:
+          python-version: "3.11"
+      - name: Install validation dependencies
+        run: >-
+          python -m pip install --disable-pip-version-check
+          jsonschema==4.26.0
+          ruff==0.15.19
+      - name: Compile pipeline
+        run: python -m compileall -q catalog_pipeline tests
+      - name: Lint Python
+        run: ruff check .
+      - name: Check Python formatting
+        run: ruff format --check .
+      - name: Test provider policies and normalization
+        run: python -m unittest discover -s tests -v
+      - name: Verify generated artifacts
+        run: >-
+          python -m catalog_pipeline.generate
+          --observations-dir fixtures
+          --output-dir fixtures/expected
+          --check

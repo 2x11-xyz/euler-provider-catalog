@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "provider_id": "anthropic",
+  "reviewed_at": "2026-07-18T00:00:00Z",
+  "membership_policy": "all_observed",
+  "default_model": "claude-sonnet-5",
+  "aliases": [],
+  "models": [],
+  "additions": []
+}

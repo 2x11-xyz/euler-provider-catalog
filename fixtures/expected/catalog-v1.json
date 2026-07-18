@@ -1,0 +1,558 @@
+{
+  "providers": {
+    "anthropic": {
+      "aliases": [],
+      "default_model": "claude-sonnet-5",
+      "display_name": "Anthropic",
+      "id": "anthropic",
+      "models": [
+        {
+          "context_window_tokens": 200000,
+          "display_name": "Claude Haiku 4.5",
+          "id": "claude-haiku-4-5",
+          "max_output_tokens": 64000,
+          "reasoning_efforts": [],
+          "status": "active",
+          "supports_reasoning": false,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 1000000,
+          "display_name": "Claude Opus 4.8",
+          "id": "claude-opus-4-8",
+          "max_output_tokens": 128000,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 1000000,
+          "display_name": "Claude Sonnet 5",
+          "id": "claude-sonnet-5",
+          "max_output_tokens": 128000,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        }
+      ]
+    },
+    "chatgpt": {
+      "aliases": [],
+      "default_model": "gpt-5.5",
+      "display_name": "ChatGPT",
+      "id": "chatgpt",
+      "models": [
+        {
+          "context_window_tokens": 128000,
+          "display_name": "GPT-5.3 Codex Spark",
+          "id": "gpt-5.3-codex-spark",
+          "max_output_tokens": 128000,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 272000,
+          "display_name": "GPT-5.4",
+          "id": "gpt-5.4",
+          "max_output_tokens": 128000,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 272000,
+          "display_name": "GPT-5.4 mini",
+          "id": "gpt-5.4-mini",
+          "max_output_tokens": 128000,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 272000,
+          "display_name": "GPT-5.5",
+          "id": "gpt-5.5",
+          "max_output_tokens": 128000,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 372000,
+          "display_name": "GPT-5.6 Luna",
+          "id": "gpt-5.6-luna",
+          "max_output_tokens": 128000,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge",
+            "max"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 372000,
+          "display_name": "GPT-5.6 Sol",
+          "id": "gpt-5.6-sol",
+          "max_output_tokens": 128000,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge",
+            "max"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 372000,
+          "display_name": "GPT-5.6 Terra",
+          "id": "gpt-5.6-terra",
+          "max_output_tokens": 128000,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge",
+            "max"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        }
+      ]
+    },
+    "openai": {
+      "aliases": [],
+      "default_model": "gpt-5.5",
+      "display_name": "OpenAI",
+      "id": "openai",
+      "models": [
+        {
+          "context_window_tokens": 1047576,
+          "display_name": "GPT-4.1 mini",
+          "id": "gpt-4.1-mini",
+          "max_output_tokens": 32768,
+          "reasoning_efforts": [],
+          "status": "active",
+          "supports_reasoning": false,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 400000,
+          "display_name": "GPT-5",
+          "id": "gpt-5",
+          "max_output_tokens": 128000,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 1050000,
+          "display_name": "GPT-5.4",
+          "id": "gpt-5.4",
+          "max_output_tokens": 128000,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 400000,
+          "display_name": "GPT-5.4 mini",
+          "id": "gpt-5.4-mini",
+          "max_output_tokens": 128000,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 400000,
+          "display_name": "GPT-5.4 nano",
+          "id": "gpt-5.4-nano",
+          "max_output_tokens": 128000,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 1050000,
+          "display_name": "GPT-5.5",
+          "id": "gpt-5.5",
+          "max_output_tokens": 128000,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 1050000,
+          "display_name": "GPT-5.6 Luna",
+          "id": "gpt-5.6-luna",
+          "max_output_tokens": 128000,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge",
+            "max"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 1050000,
+          "display_name": "GPT-5.6 Sol",
+          "id": "gpt-5.6-sol",
+          "max_output_tokens": 128000,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge",
+            "max"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 1050000,
+          "display_name": "GPT-5.6 Terra",
+          "id": "gpt-5.6-terra",
+          "max_output_tokens": 128000,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge",
+            "max"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        }
+      ]
+    },
+    "openrouter": {
+      "aliases": [],
+      "default_model": "openai/gpt-4.1-mini",
+      "display_name": "OpenRouter",
+      "id": "openrouter",
+      "models": [
+        {
+          "context_window_tokens": 1048576,
+          "display_name": "MoonshotAI: Kimi K3",
+          "id": "moonshotai/kimi-k3",
+          "reasoning_efforts": [
+            "max"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 1047576,
+          "display_name": "OpenAI: GPT-4.1 Mini",
+          "id": "openai/gpt-4.1-mini",
+          "max_output_tokens": 32768,
+          "reasoning_efforts": [],
+          "status": "active",
+          "supports_reasoning": false,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 2000000,
+          "display_name": "Auto Router",
+          "id": "openrouter/auto",
+          "max_output_tokens": 4096,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 200000,
+          "display_name": "Free Models Router",
+          "id": "openrouter/free",
+          "max_output_tokens": 4096,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 1000000,
+          "display_name": "OpenRouter: Fusion",
+          "id": "openrouter/fusion",
+          "max_output_tokens": 30000,
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 1048576,
+          "display_name": "Thinking Machines: Inkling",
+          "id": "thinkingmachines/inkling",
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "max"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        }
+      ]
+    },
+    "xai": {
+      "aliases": [],
+      "default_model": "grok-4.3",
+      "display_name": "xAI",
+      "id": "xai",
+      "models": [
+        {
+          "context_window_tokens": 131072,
+          "display_name": "Grok 3",
+          "id": "grok-3",
+          "reasoning_efforts": [],
+          "status": "deprecated",
+          "supports_reasoning": false,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 131072,
+          "display_name": "Grok 3 Fast",
+          "id": "grok-3-fast",
+          "reasoning_efforts": [],
+          "status": "active",
+          "supports_reasoning": false,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 1000000,
+          "display_name": "Grok 4.20 (Non-Reasoning)",
+          "id": "grok-4.20-0309-non-reasoning",
+          "reasoning_efforts": [],
+          "status": "active",
+          "supports_reasoning": false,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 1000000,
+          "display_name": "Grok 4.20 (Reasoning)",
+          "id": "grok-4.20-0309-reasoning",
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 1000000,
+          "display_name": "Grok 4.20 Multi-Agent",
+          "id": "grok-4.20-multi-agent-0309",
+          "reasoning_efforts": [
+            "small",
+            "medium",
+            "large",
+            "xlarge"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 1000000,
+          "display_name": "Grok 4.3",
+          "id": "grok-4.3",
+          "reasoning_efforts": [
+            "small",
+            "medium",
+            "large"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 1000000,
+          "display_name": "Grok 4.3 (grok-4.3-latest)",
+          "id": "grok-4.3-latest",
+          "reasoning_efforts": [
+            "small",
+            "medium",
+            "large"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 500000,
+          "display_name": "Grok 4.5",
+          "id": "grok-4.5",
+          "reasoning_efforts": [
+            "small",
+            "medium",
+            "large"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 256000,
+          "display_name": "Grok Build 0.1",
+          "id": "grok-build-0.1",
+          "reasoning_efforts": [
+            "xsmall",
+            "small",
+            "medium",
+            "large",
+            "xlarge"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 32768,
+          "display_name": "Grok Code Fast 1",
+          "id": "grok-code-fast-1",
+          "reasoning_efforts": [],
+          "status": "deprecated",
+          "supports_reasoning": false,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 1000000,
+          "display_name": "Grok 4.3 (grok-latest)",
+          "id": "grok-latest",
+          "reasoning_efforts": [
+            "small",
+            "medium",
+            "large"
+          ],
+          "status": "active",
+          "supports_reasoning": true,
+          "supports_tools": true
+        }
+      ]
+    }
+  },
+  "schema_version": 1
+}

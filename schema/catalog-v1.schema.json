@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/2x11-xyz/euler-provider-catalog/main/schema/catalog-v1.schema.json",
+  "title": "Euler provider catalog v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "providers"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "providers": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 32,
+      "patternProperties": {
+        "^[a-z][a-z0-9-]{0,63}$": {
+          "$ref": "#/$defs/provider"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "display_name",
+        "default_model",
+        "aliases",
+        "models"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{0,63}$"
+        },
+        "display_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "default_model": {
+          "$ref": "#/$defs/model_id"
+        },
+        "aliases": {
+          "type": "array",
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/model_id"
+          }
+        },
+        "models": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10000,
+          "items": {
+            "$ref": "#/$defs/model"
+          }
+        }
+      }
+    },
+    "model_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^(?!.*::)[^\\s]+$"
+    },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "display_name",
+        "status",
+        "context_window_tokens",
+        "supports_tools",
+        "supports_reasoning",
+        "reasoning_efforts"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/model_id"
+        },
+        "display_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "status": {
+          "enum": [
+            "active",
+            "deprecated",
+            "removed"
+          ]
+        },
+        "context_window_tokens": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000000
+        },
+        "max_output_tokens": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000000
+        },
+        "supports_tools": {
+          "const": true
+        },
+        "supports_reasoning": {
+          "type": "boolean"
+        },
+        "reasoning_efforts": {
+          "type": "array",
+          "maxItems": 6,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "xsmall",
+              "small",
+              "medium",
+              "large",
+              "xlarge",
+              "max"
+            ]
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "supports_reasoning": {
+                "const": false
+              }
+            },
+            "required": [
+              "supports_reasoning"
+            ]
+          },
+          "then": {
+            "properties": {
+              "reasoning_efforts": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "supports_reasoning": {
+                "const": true
+              }
+            },
+            "required": [
+              "supports_reasoning"
+            ]
+          },
+          "then": {
+            "properties": {
+              "reasoning_efforts": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

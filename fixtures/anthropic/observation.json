@@ -1,0 +1,14 @@
+{
+  "inputs": [
+    {
+      "bytes": 2865,
+      "endpoint_id": "models",
+      "file": "models.json",
+      "sha256": "2996c42607f8dda123a123f10af84b2cc786df5607bf3cf121d1f05589c16471",
+      "source_url": "https://api.anthropic.com/v1/models?limit=1000"
+    }
+  ],
+  "observed_at": "2026-07-18T00:00:00Z",
+  "provider_id": "anthropic",
+  "schema_version": 1
+}

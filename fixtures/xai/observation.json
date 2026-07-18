@@ -1,0 +1,21 @@
+{
+  "inputs": [
+    {
+      "bytes": 2379,
+      "endpoint_id": "language-models",
+      "file": "language-models.json",
+      "sha256": "5857a28655ffb7a2afe02c5889d7706ce4cf56e842004a7e58cb7b76998aa56b",
+      "source_url": "https://api.x.ai/v1/language-models"
+    },
+    {
+      "bytes": 1855,
+      "endpoint_id": "models",
+      "file": "models.json",
+      "sha256": "9e91d1536d6a5f1a03f339934d39e47df8efdb9fc9952221762fbab7f3d505fd",
+      "source_url": "https://api.x.ai/v1/models"
+    }
+  ],
+  "observed_at": "2026-07-18T00:00:00Z",
+  "provider_id": "xai",
+  "schema_version": 1
+}

@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "provider_id": "openai",
+  "display_name": "OpenAI",
+  "normalizer": "openai",
+  "minimum_euler_version": "0.1.1",
+  "discovery": {
+    "kind": "official_api",
+    "endpoints": [
+      {
+        "id": "models",
+        "url": "https://api.openai.com/v1/models",
+        "file": "models.json"
+      }
+    ],
+    "documentation_urls": [
+      "https://platform.openai.com/docs/api-reference/models/list",
+      "https://developers.openai.com/api/docs/models"
+    ]
+  },
+  "field_ownership": {
+    "membership": "official_api.data[] intersect euler_reviewed_models",
+    "id": "official_api.data[].id",
+    "display_name": "official_model_documentation",
+    "context_window_tokens": "official_model_documentation",
+    "max_output_tokens": "official_model_documentation",
+    "supports_tools": "official_model_documentation",
+    "supports_reasoning": "official_model_documentation",
+    "reasoning_efforts": "official_model_documentation",
+    "default_model": "euler_curated"
+  },
+  "filters": {
+    "required_object_type": "model",
+    "required_owned_by": [
+      "openai",
+      "system"
+    ],
+    "forbidden_id_prefixes": [
+      "ft:"
+    ],
+    "membership_policy": "reviewed_only",
+    "required_adapter_contract": [
+      "chat_completions",
+      "streaming",
+      "function_calling"
+    ]
+  },
+  "limits": {
+    "max_response_bytes": 2097152,
+    "minimum_observed_models": 3,
+    "minimum_published_models": 3,
+    "maximum_published_models": 1000,
+    "maximum_model_id_bytes": 256,
+    "maximum_display_name_bytes": 256,
+    "maximum_token_limit": 20000000
+  }
+}

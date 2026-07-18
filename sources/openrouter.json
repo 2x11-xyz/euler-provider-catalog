@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "provider_id": "openrouter",
+  "display_name": "OpenRouter",
+  "normalizer": "openrouter",
+  "minimum_euler_version": "0.1.1",
+  "discovery": {
+    "kind": "official_api",
+    "endpoints": [
+      {
+        "id": "models",
+        "url": "https://openrouter.ai/api/v1/models",
+        "file": "models.json"
+      }
+    ],
+    "documentation_urls": [
+      "https://openrouter.ai/docs/api/api-reference/models/get-models"
+    ]
+  },
+  "field_ownership": {
+    "membership": "official_api.data[]",
+    "id": "official_api.data[].id",
+    "display_name": "official_api.data[].name",
+    "context_window_tokens": "official_api.data[].context_length",
+    "max_output_tokens": "official_api.data[].top_provider.max_completion_tokens",
+    "supports_tools": "official_api.data[].supported_parameters",
+    "supports_reasoning": "official_api reasoning metadata",
+    "reasoning_efforts": "official_api.data[].reasoning.supported_efforts",
+    "default_model": "euler_curated",
+    "router_pseudo_models": "euler_curated"
+  },
+  "filters": {
+    "required_supported_parameters": [
+      "tools"
+    ],
+    "required_output_modalities": [
+      "text"
+    ]
+  },
+  "limits": {
+    "max_response_bytes": 8388608,
+    "minimum_observed_models": 3,
+    "minimum_published_models": 3,
+    "maximum_published_models": 5000,
+    "maximum_model_id_bytes": 256,
+    "maximum_display_name_bytes": 256,
+    "maximum_token_limit": 20000000
+  },
+  "default_reasoning_efforts": [
+    "xsmall",
+    "small",
+    "medium",
+    "large",
+    "xlarge"
+  ],
+  "reasoning_effort_map": {
+    "minimal": "xsmall",
+    "low": "small",
+    "medium": "medium",
+    "high": "large",
+    "xhigh": "xlarge",
+    "max": "max"
+  }
+}

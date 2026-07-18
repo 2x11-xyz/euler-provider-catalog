@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "provider_id": "anthropic",
+  "display_name": "Anthropic",
+  "normalizer": "anthropic",
+  "minimum_euler_version": "0.1.1",
+  "discovery": {
+    "kind": "official_api",
+    "endpoints": [
+      {
+        "id": "models",
+        "url": "https://api.anthropic.com/v1/models?limit=1000",
+        "file": "models.json"
+      }
+    ],
+    "documentation_urls": [
+      "https://platform.claude.com/docs/en/api/models/list",
+      "https://platform.claude.com/docs/en/about-claude/models/overview",
+      "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview"
+    ]
+  },
+  "field_ownership": {
+    "membership": "official_api.data[]",
+    "id": "official_api.data[].id",
+    "display_name": "official_api.data[].display_name",
+    "context_window_tokens": "official_api.data[].max_input_tokens",
+    "max_output_tokens": "official_api.data[].max_tokens",
+    "supports_tools": "official_tool_use_contract",
+    "supports_reasoning": "official_api.data[].capabilities.thinking.types.adaptive and capabilities.effort",
+    "reasoning_efforts": "official_api.data[].capabilities.effort constrained by the Euler adaptive-thinking adapter",
+    "default_model": "euler_curated"
+  },
+  "filters": {
+    "required_object_type": "model"
+  },
+  "limits": {
+    "max_response_bytes": 2097152,
+    "minimum_observed_models": 3,
+    "minimum_published_models": 3,
+    "maximum_published_models": 1000,
+    "maximum_model_id_bytes": 256,
+    "maximum_display_name_bytes": 256,
+    "maximum_token_limit": 20000000
+  },
+  "default_reasoning_efforts": [
+    "xsmall",
+    "small",
+    "medium",
+    "large",
+    "xlarge"
+  ],
+  "reasoning_effort_map": {
+    "low": "xsmall",
+    "medium": "small",
+    "high": "medium",
+    "xhigh": "large",
+    "max": "xlarge"
+  }
+}
