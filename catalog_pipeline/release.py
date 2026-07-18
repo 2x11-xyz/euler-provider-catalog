@@ -44,6 +44,7 @@ def _valid_provenance_path(path: str, provider_id: str, kind: str) -> bool:
     parsed = PurePosixPath(path)
     if (
         parsed.is_absolute()
+        or path != parsed.as_posix()
         or "\\" in path
         or any(part in {"", ".", ".."} for part in parsed.parts)
     ):

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -199,7 +200,7 @@ def main() -> int:
         )
         write_or_check(args.output_dir, artifacts.encoded, check=args.check)
     except CatalogError as error:
-        print(f"catalog generation failed: {error}")
+        print(f"catalog generation failed: {error}", file=sys.stderr)
         return 1
     action = "verified" if args.check else "generated"
     print(f"{action} {len(artifacts.encoded)} centralized catalog artifacts")

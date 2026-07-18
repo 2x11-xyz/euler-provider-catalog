@@ -163,6 +163,7 @@
         "lifecycle_changes": {
           "type": "array",
           "maxItems": 10000,
+          "uniqueItems": true,
           "items": {
             "type": "object",
             "additionalProperties": false,
@@ -187,6 +188,7 @@
         "metadata_changes": {
           "type": "array",
           "maxItems": 10000,
+          "uniqueItems": true,
           "items": {
             "type": "object",
             "additionalProperties": false,

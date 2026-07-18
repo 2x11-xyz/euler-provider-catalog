@@ -258,19 +258,22 @@ class PromotionTests(unittest.TestCase):
                     validate_promotion_diff(diff)
 
     def test_release_loader_rejects_unsafe_provenance_paths(self) -> None:
-        def corrupt_path(provenance: dict[str, Any]) -> None:
-            inputs = provenance["providers"]["openrouter"]["inputs"]
-            observation = next(item for item in inputs if item["kind"] == "official_api")
-            observation["path"] = "../../secrets.json"
+        for unsafe_path in ("../../secrets.json", "observations//openrouter/models.json"):
+            with self.subTest(path=unsafe_path):
 
-        release = changed_release(self.release, provenance_change=corrupt_path)
-        with tempfile.TemporaryDirectory() as temporary:
-            candidate = Path(temporary) / "candidate"
-            candidate.mkdir()
-            for name, data in release.encoded.items():
-                (candidate / name).write_bytes(data)
-            with self.assertRaisesRegex(CatalogError, "provenance input is invalid"):
-                load_release(candidate)
+                def corrupt_path(provenance: dict[str, Any]) -> None:
+                    inputs = provenance["providers"]["openrouter"]["inputs"]
+                    observation = next(item for item in inputs if item["kind"] == "official_api")
+                    observation["path"] = unsafe_path
+
+                release = changed_release(self.release, provenance_change=corrupt_path)
+                with tempfile.TemporaryDirectory() as temporary:
+                    candidate = Path(temporary) / "candidate"
+                    candidate.mkdir()
+                    for name, data in release.encoded.items():
+                        (candidate / name).write_bytes(data)
+                    with self.assertRaisesRegex(CatalogError, "provenance input is invalid"):
+                        load_release(candidate)
 
     def test_blocked_cli_returns_nonzero_and_retains_the_diff(self) -> None:
         def remove_model(catalog: dict[str, Any]) -> None:
