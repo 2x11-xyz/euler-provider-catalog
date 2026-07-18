@@ -6,6 +6,9 @@ from pathlib import Path
 
 import jsonschema
 
+from catalog_pipeline.promotion import classify_promotion, load_promotion_policy
+from catalog_pipeline.release import load_release
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -35,6 +38,16 @@ class SchemaTests(unittest.TestCase):
                     (ROOT / "fixtures" / provider_id / "observation.json").read_bytes()
                 )
                 validator.validate(document)
+
+    def test_promotion_policy_conforms_to_its_schema(self) -> None:
+        document = json.loads((ROOT / "promotion-policy.json").read_bytes())
+        self._validator("promotion-policy-v1.schema.json").validate(document)
+
+    def test_bootstrap_diff_conforms_to_its_schema(self) -> None:
+        release = load_release(ROOT / "fixtures" / "expected")
+        policy = load_promotion_policy(ROOT / "promotion-policy.json")
+        diff = classify_promotion(None, release, policy)
+        self._validator("diff-v1.schema.json").validate(diff)
 
 
 if __name__ == "__main__":

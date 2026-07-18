@@ -21,10 +21,23 @@ observations. They are not a production catalog and must never be released.
 
 ## Phase 2: guarded promotion and GitHub Releases
 
+Status: promotion classification is implemented. Stable-state writes, bot pull
+requests, removal-history enforcement, and release publication remain gated on
+the repository prerequisites below and a reviewed first live baseline.
+
+The classifier authenticates canonical candidate and stable artifacts, records
+model/provider/governed-input changes in `diff-v1.json`, separates addition-only
+updates from human-review changes, and blocks any candidate that drops more
+than the configured fraction of a provider's prior model IDs. The initial
+threshold in `promotion-policy.json` is 1,000 basis points (10%); the
+calculation rounds upward so a change is never understated. Every removal at
+or below that threshold still requires human review.
+
 ### Repository prerequisites
 
 1. Protect `main` and require the catalog CI check.
-2. Add `CODEOWNERS` review for `sources/`, `curated/`, schemas, and release
+2. Enable required code-owner review using the checked-in `CODEOWNERS` rules
+   for `sources/`, `curated/`, schemas, promotion policy, stable state, and
    workflows.
 3. Configure dedicated discovery credentials as repository secrets:
    `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, and `XAI_API_KEY`.

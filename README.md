@@ -32,7 +32,8 @@ The repository layout keeps those decisions visible:
   provider-specific acceptance rules;
 - `curated/` records defaults and the narrow metadata that APIs do not expose;
 - `catalog_pipeline/` fetches bounded observations and generates artifacts;
-- `schema/` defines the catalog, manifest, provenance, and observation formats;
+- `promotion-policy.json` owns the reviewed catalog-shrink threshold;
+- `schema/` defines the runtime, evidence, and promotion formats;
 - `fixtures/` contains deterministic multi-provider upstream evidence;
 - `fixtures/expected/` is the byte-for-byte expected centralized output for
   the checked-in fixtures. It is test data, never a release source.
@@ -67,6 +68,21 @@ python -m catalog_pipeline.generate \
   --observations-dir observations \
   --output-dir candidate
 ```
+
+Classify a complete candidate against the current stable release:
+
+```console
+python -m catalog_pipeline.promotion \
+  --candidate-dir candidate \
+  --previous-dir stable \
+  --output-dir promotion-review
+```
+
+The classifier authenticates both releases, emits a deterministic
+`diff-v1.json`, and returns a nonzero status for a blocked candidate. Omit
+`--previous-dir` only when preparing the first stable baseline; bootstrap is
+always classified as requiring human review. The classifier never writes to
+`stable/`.
 
 ## Publication model
 
