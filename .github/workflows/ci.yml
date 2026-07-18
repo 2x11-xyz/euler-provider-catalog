@@ -30,5 +30,5 @@ jobs:
         run: >-
           python -m catalog_pipeline.generate
           --observations-dir fixtures
-          --output-dir generated
+          --output-dir fixtures/expected
           --check

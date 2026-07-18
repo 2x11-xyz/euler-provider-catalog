@@ -28,7 +28,7 @@ class PipelineTests(unittest.TestCase):
     def test_checked_in_artifacts_are_byte_identical(self) -> None:
         artifacts = generate()
         for name, expected in artifacts.encoded.items():
-            self.assertEqual((ROOT / "generated" / name).read_bytes(), expected, name)
+            self.assertEqual((ROOT / "fixtures" / "expected" / name).read_bytes(), expected, name)
 
     def test_catalog_centralizes_every_euler_provider(self) -> None:
         catalog = generate().documents["catalog-v1.json"]

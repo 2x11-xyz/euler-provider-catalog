@@ -34,15 +34,15 @@ The repository layout keeps those decisions visible:
 - `catalog_pipeline/` fetches bounded observations and generates artifacts;
 - `schema/` defines the catalog, manifest, provenance, and observation formats;
 - `fixtures/` contains deterministic multi-provider upstream evidence;
-- `generated/` is the byte-for-byte expected centralized output for the
-  checked-in fixtures.
+- `fixtures/expected/` is the byte-for-byte expected centralized output for
+  the checked-in fixtures. It is test data, never a release source.
 
 Generate the checked-in fixture artifacts:
 
 ```console
 python -m catalog_pipeline.generate \
   --observations-dir fixtures \
-  --output-dir generated
+  --output-dir fixtures/expected
 ```
 
 Run the tests and verify that generated artifacts are current:
@@ -52,7 +52,7 @@ python -m pip install jsonschema==4.26.0
 python -m unittest discover -s tests -v
 python -m catalog_pipeline.generate \
   --observations-dir fixtures \
-  --output-dir generated \
+  --output-dir fixtures/expected \
   --check
 ```
 

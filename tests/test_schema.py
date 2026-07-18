@@ -22,7 +22,9 @@ class SchemaTests(unittest.TestCase):
     def test_published_artifacts_conform_to_their_schemas(self) -> None:
         for stem in ("catalog-v1", "manifest-v1", "provenance-v1"):
             with self.subTest(artifact=stem):
-                document = json.loads((ROOT / "generated" / f"{stem}.json").read_bytes())
+                document = json.loads(
+                    (ROOT / "fixtures" / "expected" / f"{stem}.json").read_bytes()
+                )
                 self._validator(f"{stem}.schema.json").validate(document)
 
     def test_observation_sidecars_conform_to_their_schema(self) -> None:
