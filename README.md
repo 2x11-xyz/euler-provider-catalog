@@ -48,7 +48,9 @@ python -m catalog_pipeline.generate \
 Run the tests and verify that generated artifacts are current:
 
 ```console
-python -m pip install jsonschema==4.26.0
+python -m pip install jsonschema==4.26.0 ruff==0.15.19
+ruff check .
+ruff format --check .
 python -m unittest discover -s tests -v
 python -m catalog_pipeline.generate \
   --observations-dir fixtures \
@@ -74,6 +76,10 @@ list. Phase one retains the bounded response observations and generated
 candidate as a workflow artifact. Promotion pull requests and GitHub Release
 publication are the next implementation phase; the workflow does not mutate
 the stable catalog yet.
+
+The retention step also runs after an observation or generation failure so
+maintainers can inspect partial, already-projected evidence. Partial artifacts
+are debugging evidence only and are never eligible for promotion.
 
 The OpenAI and xAI observations are publication-safe projections of their
 official responses: only provider-owned model records are written to disk.

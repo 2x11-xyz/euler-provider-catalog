@@ -12,6 +12,7 @@ from .common import (
     canonical_json_bytes,
     sha256_hex,
     validate_model,
+    validate_model_id,
     write_or_check,
 )
 from .config import SUPPORTED_PROVIDERS, load_curated, load_policy
@@ -51,8 +52,16 @@ def _validate_provider(provider: dict[str, Any], limits: dict[str, Any]) -> None
     if default is None or default["status"] != "active":
         raise CatalogError(f"{provider_id} default model is not active in the candidate")
     aliases = provider["aliases"]
+    for index, alias in enumerate(aliases):
+        validate_model_id(
+            alias,
+            int(limits["maximum_model_id_bytes"]),
+            f"catalog.{provider_id}.aliases[{index}]",
+        )
     if aliases != sorted(set(aliases)):
         raise CatalogError(f"{provider_id} aliases are not unique and sorted")
+    if set(aliases) & set(by_id):
+        raise CatalogError(f"{provider_id} aliases duplicate model ids")
 
 
 def generate_artifacts(

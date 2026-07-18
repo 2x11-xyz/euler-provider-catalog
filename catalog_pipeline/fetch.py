@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from .common import CatalogError, atomic_write, canonical_json_bytes
+from .common import CatalogError, atomic_write, canonical_json_bytes, is_provider_owned_record
 from .config import SUPPORTED_PROVIDERS, load_policy
 from .record_observation import record
 
@@ -99,25 +99,17 @@ def _public_projection(
     records = payload.get(collection_name)
     if not isinstance(records, list):
         raise CatalogError(f"{provider_id} official response is missing {collection_name}")
-    allowed_owners = set(filters["required_owned_by"])
-    forbidden_prefixes = tuple(filters.get("forbidden_id_prefixes", []))
     retained = []
-    for record in records:
-        if not isinstance(record, dict) or record.get("owned_by") not in allowed_owners:
-            continue
-        model_id = record.get("id")
-        if not isinstance(model_id, str) or model_id.startswith(forbidden_prefixes):
-            continue
-        retained.append(record)
+    for model_record in records:
+        if is_provider_owned_record(model_record, filters):
+            retained.append(model_record)
     projection = dict(payload)
     projection[collection_name] = retained
     return canonical_json_bytes(projection)
 
 
-def fetch_provider(
-    *, provider_id: str, observations_dir: Path, sources_dir: Path, observed_at: str
-) -> None:
-    policy, _ = load_policy(sources_dir, provider_id)
+def fetch_provider(*, policy: dict[str, Any], observations_dir: Path, observed_at: str) -> None:
+    provider_id = policy["provider_id"]
     if policy["discovery"]["kind"] != "official_api":
         raise CatalogError(f"{provider_id} has no official API observation")
     provider_dir = observations_dir / provider_id
@@ -133,9 +125,8 @@ def fetch_provider(
         atomic_write(provider_dir / endpoint["file"], observation)
         print(f"observed {provider_id}/{endpoint['id']}: {len(observation)} bytes")
     record(
-        provider_id=provider_id,
+        policy=policy,
         observations_dir=observations_dir,
-        sources_dir=sources_dir,
         observed_at=observed_at,
     )
 
@@ -160,9 +151,8 @@ def main() -> int:
             if policy["discovery"]["kind"] != "official_api":
                 continue
             fetch_provider(
-                provider_id=provider_id,
+                policy=policy,
                 observations_dir=args.output_dir,
-                sources_dir=args.sources_dir,
                 observed_at=observed_at,
             )
             observed += 1

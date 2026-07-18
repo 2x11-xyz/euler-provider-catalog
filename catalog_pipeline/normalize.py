@@ -6,6 +6,7 @@ from typing import Any, Callable
 from .common import (
     CatalogError,
     REASONING_EFFORTS,
+    is_provider_owned_record,
     positive_int,
     require_array,
     require_object,
@@ -29,6 +30,11 @@ def _increment(skipped: dict[str, int], reason: str) -> None:
 def _canonical_efforts(values: list[str]) -> list[str]:
     unique = set(values)
     return [effort for effort in REASONING_EFFORTS if effort in unique]
+
+
+def _require_provider_owned(value: dict[str, Any], policy: dict[str, Any], scope: str) -> None:
+    if not is_provider_owned_record(value, policy["filters"]):
+        raise CatalogError(f"{scope} is not a public provider-owned model record")
 
 
 def _finish(
@@ -146,8 +152,8 @@ def _openrouter(
 
         reasoning = value.get("reasoning")
         reasoning_parameters = {"reasoning", "reasoning_effort", "include_reasoning"}
-        supports_reasoning = bool(reasoning_parameters & set(parameters)) or isinstance(
-            reasoning, dict
+        supports_reasoning = bool(reasoning_parameters & set(parameters)) or (
+            isinstance(reasoning, dict) and bool(reasoning)
         )
         mapped: list[str] = []
         if isinstance(reasoning, dict) and isinstance(reasoning.get("supported_efforts"), list):
@@ -193,7 +199,8 @@ def _anthropic(
     if curated["membership_policy"] != "all_observed" or curated["models"]:
         raise CatalogError("anthropic supports API-owned records plus explicit additions only")
     payload = require_object(payloads["models"], "anthropic.models response")
-    if payload.get("has_more") is True:
+    has_more = payload.get("has_more")
+    if has_more is not False and has_more is not None:
         raise CatalogError("anthropic models response is paginated beyond the bounded observation")
     records = require_array(payload.get("data"), "anthropic.models.data")
     effort_map = policy["reasoning_effort_map"]
@@ -281,13 +288,15 @@ def _openai(
     observed_ids: set[str] = set()
     skipped: dict[str, int] = {}
     for value in records:
-        if not isinstance(value, dict) or value.get("object") != policy["filters"][
-            "required_object_type"
-        ]:
+        if not isinstance(value, dict):
             _increment(skipped, "malformed_or_unsupported_record")
             continue
         model_id = value.get("id")
         if not isinstance(model_id, str) or not model_id:
+            _increment(skipped, "malformed_or_unsupported_record")
+            continue
+        _require_provider_owned(value, policy, "openai.models record")
+        if value.get("object") != policy["filters"]["required_object_type"]:
             _increment(skipped, "malformed_or_unsupported_record")
             continue
         if model_id in observed_ids:
@@ -337,8 +346,11 @@ def _xai(
         if not isinstance(value, dict):
             continue
         model_id = value.get("id")
+        if not isinstance(model_id, str) or not model_id:
+            continue
+        _require_provider_owned(value, policy, "xai.models record")
         context = positive_int(value.get("context_length"))
-        if not isinstance(model_id, str) or not model_id or context is None:
+        if context is None:
             continue
         contexts[model_id] = context
         aliases = value.get("aliases")
@@ -351,56 +363,81 @@ def _xai(
     used_reviewed: set[str] = set()
     required_modalities = set(policy["filters"]["required_output_modalities"])
     skipped: dict[str, int] = {}
-    models_by_id: dict[str, dict[str, Any]] = {}
+    records: list[dict[str, Any]] = []
+    primary_ids: set[str] = set()
     for value in language_models:
-        if not isinstance(value, dict) or value.get("object") != policy["filters"][
-            "required_object_type"
-        ]:
+        if not isinstance(value, dict):
+            _increment(skipped, "malformed_or_unsupported_record")
+            continue
+        primary_id = value.get("id")
+        if not isinstance(primary_id, str) or not primary_id:
+            _increment(skipped, "malformed_or_unsupported_record")
+            continue
+        _require_provider_owned(value, policy, "xai.language-models record")
+        if value.get("object") != policy["filters"]["required_object_type"]:
             _increment(skipped, "malformed_or_unsupported_record")
             continue
         modalities = value.get("output_modalities")
         if not isinstance(modalities, list) or not required_modalities.issubset(set(modalities)):
             _increment(skipped, "text_output_not_supported")
             continue
-        primary_id = value.get("id")
-        if not isinstance(primary_id, str) or not primary_id:
-            _increment(skipped, "malformed_or_unsupported_record")
+        if primary_id in primary_ids:
+            _increment(skipped, "duplicate_id")
             continue
-        candidate_ids = [primary_id]
+        primary_ids.add(primary_id)
+        records.append(value)
+
+    models_by_id: dict[str, dict[str, Any]] = {}
+
+    def add_model(model_id: str, primary_id: str) -> None:
+        reviewed_model = reviewed.get(model_id)
+        inherited_alias = reviewed_model is None and model_id != primary_id
+        if inherited_alias:
+            reviewed_model = reviewed.get(primary_id)
+        context = contexts.get(model_id) or contexts.get(primary_id)
+        if reviewed_model is not None:
+            model = dict(reviewed_model)
+            used_reviewed.add(reviewed_model["id"])
+            if inherited_alias:
+                model["id"] = model_id
+                model["display_name"] = f"{reviewed_model['display_name']} ({model_id})"
+            if context is not None:
+                model["context_window_tokens"] = context
+        else:
+            if context is None:
+                _increment(skipped, "missing_context_limit")
+                return
+            model = {
+                "id": model_id,
+                "display_name": model_id,
+                "status": "active",
+                "context_window_tokens": context,
+                "supports_tools": True,
+                "supports_reasoning": False,
+                "reasoning_efforts": [],
+            }
+        models_by_id[model_id] = model
+
+    for value in records:
+        add_model(value["id"], value["id"])
+
+    for value in records:
+        primary_id = value["id"]
         aliases = value.get("aliases")
         if isinstance(aliases, list):
-            candidate_ids.extend(alias for alias in aliases if isinstance(alias, str) and alias)
-        primary_reviewed = reviewed.get(primary_id)
+            candidate_ids = [alias for alias in aliases if isinstance(alias, str) and alias]
+        else:
+            candidate_ids = []
         for model_id in candidate_ids:
-            if model_id in models_by_id:
+            if model_id == primary_id:
                 continue
-            context = contexts.get(model_id) or contexts.get(primary_id)
-            reviewed_model = reviewed.get(model_id)
-            inherited_alias = reviewed_model is None and model_id != primary_id
-            if inherited_alias:
-                reviewed_model = primary_reviewed
-            if reviewed_model is not None:
-                model = dict(reviewed_model)
-                used_reviewed.add(reviewed_model["id"])
-                if inherited_alias:
-                    model["id"] = model_id
-                    model["display_name"] = f"{reviewed_model['display_name']} ({model_id})"
-                if context is not None:
-                    model["context_window_tokens"] = context
-            else:
-                if context is None:
-                    _increment(skipped, "missing_context_limit")
-                    continue
-                model = {
-                    "id": model_id,
-                    "display_name": model_id,
-                    "status": "active",
-                    "context_window_tokens": context,
-                    "supports_tools": True,
-                    "supports_reasoning": False,
-                    "reasoning_efforts": [],
-                }
-            models_by_id[model_id] = model
+            if model_id in primary_ids:
+                _increment(skipped, "alias_collides_with_primary_id")
+                continue
+            if model_id in models_by_id:
+                _increment(skipped, "duplicate_alias")
+                continue
+            add_model(model_id, primary_id)
 
     unavailable = len(set(reviewed) - used_reviewed)
     warnings = []

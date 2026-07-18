@@ -85,6 +85,33 @@ def validate_timestamp(value: Any, scope: str) -> str:
     return timestamp
 
 
+def validate_model_id(value: Any, maximum_bytes: int, scope: str) -> str:
+    model_id = require_string(value, scope)
+    if any(character.isspace() for character in model_id) or "::" in model_id:
+        raise CatalogError(f"{scope} is not a valid Euler model id")
+    if len(model_id.encode()) > maximum_bytes:
+        raise CatalogError(f"{scope} is too long")
+    return model_id
+
+
+def is_provider_owned_record(value: Any, filters: dict[str, Any]) -> bool:
+    owners = filters.get("required_owned_by")
+    prefixes = filters.get("forbidden_id_prefixes", [])
+    valid_filters = (
+        isinstance(owners, list)
+        and bool(owners)
+        and all(isinstance(owner, str) and owner for owner in owners)
+        and isinstance(prefixes, list)
+        and all(isinstance(prefix, str) and prefix for prefix in prefixes)
+    )
+    if not valid_filters:
+        raise CatalogError("provider ownership filters are invalid")
+    if not isinstance(value, dict) or value.get("owned_by") not in owners:
+        return False
+    model_id = value.get("id")
+    return isinstance(model_id, str) and bool(model_id) and not model_id.startswith(tuple(prefixes))
+
+
 def validate_model(model: Any, limits: dict[str, Any], scope: str) -> dict[str, Any]:
     record = require_object(model, scope)
     fields = set(record)
@@ -95,11 +122,7 @@ def validate_model(model: Any, limits: dict[str, Any], scope: str) -> dict[str, 
     if unknown:
         raise CatalogError(f"{scope} has unknown fields: {', '.join(sorted(unknown))}")
 
-    model_id = require_string(record["id"], f"{scope}.id")
-    if any(character.isspace() for character in model_id) or "::" in model_id:
-        raise CatalogError(f"{scope}.id is not a valid Euler model id")
-    if len(model_id.encode()) > int(limits["maximum_model_id_bytes"]):
-        raise CatalogError(f"{scope}.id is too long")
+    validate_model_id(record["id"], int(limits["maximum_model_id_bytes"]), f"{scope}.id")
 
     display_name = require_string(record["display_name"], f"{scope}.display_name")
     if len(display_name.encode()) > int(limits["maximum_display_name_bytes"]):
@@ -153,3 +176,14 @@ def write_or_check(output_dir: Path, outputs: dict[str, bytes], *, check: bool) 
             atomic_write(path, data)
     if stale:
         raise CatalogError(f"generated artifacts are stale: {', '.join(sorted(stale))}")
+    if check and output_dir.exists():
+        try:
+            unexpected = sorted(
+                path.name for path in output_dir.iterdir() if path.name not in outputs
+            )
+        except OSError as error:
+            raise CatalogError(f"cannot inspect generated artifact directory: {error}") from error
+        if unexpected:
+            raise CatalogError(
+                "generated artifact directory contains unexpected entries: " + ", ".join(unexpected)
+            )

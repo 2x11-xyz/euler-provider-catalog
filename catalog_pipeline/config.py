@@ -6,16 +6,72 @@ from typing import Any
 from .common import (
     CatalogError,
     PROVIDER_ID_PATTERN,
+    REASONING_EFFORTS,
     read_json,
     require_array,
     require_object,
     require_string,
     validate_model,
+    validate_model_id,
     validate_timestamp,
 )
 
 
 SUPPORTED_PROVIDERS = ("anthropic", "chatgpt", "openai", "openrouter", "xai")
+
+
+def _string_array(value: Any, scope: str, *, allow_empty: bool = False) -> list[str]:
+    items = require_array(value, scope)
+    valid = all(isinstance(item, str) and item for item in items)
+    if not valid or (not items and not allow_empty) or len(items) != len(set(items)):
+        raise CatalogError(f"{scope} must contain unique non-empty strings")
+    return items
+
+
+def _validate_reasoning_policy(policy: dict[str, Any], provider_id: str) -> None:
+    mapping = require_object(
+        policy.get("reasoning_effort_map"), f"{provider_id}.reasoning_effort_map"
+    )
+    invalid_mapping = not mapping or any(
+        not isinstance(upstream, str) or not upstream or canonical not in REASONING_EFFORTS
+        for upstream, canonical in mapping.items()
+    )
+    if invalid_mapping:
+        raise CatalogError(f"{provider_id}.reasoning_effort_map is invalid")
+    defaults = _string_array(
+        policy.get("default_reasoning_efforts"),
+        f"{provider_id}.default_reasoning_efforts",
+    )
+    if any(effort not in REASONING_EFFORTS for effort in defaults):
+        raise CatalogError(f"{provider_id}.default_reasoning_efforts is invalid")
+    if defaults != sorted(defaults, key=REASONING_EFFORTS.index):
+        raise CatalogError(f"{provider_id}.default_reasoning_efforts is not in canonical order")
+
+
+def _validate_filters(policy: dict[str, Any], provider_id: str) -> None:
+    normalizer = policy["normalizer"]
+    filters = require_object(policy.get("filters"), f"{provider_id}.filters")
+    if normalizer in {"anthropic", "openai", "xai"}:
+        require_string(filters.get("required_object_type"), f"{provider_id}.required_object_type")
+    if normalizer in {"openai", "xai"}:
+        _string_array(filters.get("required_owned_by"), f"{provider_id}.required_owned_by")
+        _string_array(
+            filters.get("forbidden_id_prefixes", []),
+            f"{provider_id}.forbidden_id_prefixes",
+            allow_empty=True,
+        )
+    if normalizer in {"openrouter", "xai"}:
+        _string_array(
+            filters.get("required_output_modalities"),
+            f"{provider_id}.required_output_modalities",
+        )
+    if normalizer == "openrouter":
+        _string_array(
+            filters.get("required_supported_parameters"),
+            f"{provider_id}.required_supported_parameters",
+        )
+    if normalizer in {"anthropic", "openrouter"}:
+        _validate_reasoning_policy(policy, provider_id)
 
 
 def load_policy(sources_dir: Path, provider_id: str) -> tuple[dict[str, Any], bytes]:
@@ -26,8 +82,11 @@ def load_policy(sources_dir: Path, provider_id: str) -> tuple[dict[str, Any], by
     if provider_id not in SUPPORTED_PROVIDERS or not PROVIDER_ID_PATTERN.fullmatch(provider_id):
         raise CatalogError(f"unsupported provider id: {provider_id}")
     require_string(policy.get("display_name"), f"{provider_id}.display_name")
-    require_string(policy.get("normalizer"), f"{provider_id}.normalizer")
+    normalizer = require_string(policy.get("normalizer"), f"{provider_id}.normalizer")
+    if normalizer not in {"anthropic", "curated", "openai", "openrouter", "xai"}:
+        raise CatalogError(f"{provider_id}.normalizer is unsupported")
     require_string(policy.get("minimum_euler_version"), f"{provider_id}.minimum_euler_version")
+    _validate_filters(policy, provider_id)
 
     discovery = require_object(policy.get("discovery"), f"{provider_id}.discovery")
     if discovery.get("kind") not in {"official_api", "curated"}:
@@ -103,11 +162,18 @@ def load_curated(
     validate_timestamp(curated["reviewed_at"], f"{provider_id}.reviewed_at")
     if curated["membership_policy"] not in {"all_observed", "reviewed_only", "curated_only"}:
         raise CatalogError(f"{provider_id}.membership_policy is invalid")
-    require_string(curated["default_model"], f"{provider_id}.default_model")
+    maximum_model_id_bytes = int(limits["maximum_model_id_bytes"])
+    validate_model_id(
+        curated["default_model"], maximum_model_id_bytes, f"{provider_id}.default_model"
+    )
     aliases = require_array(curated["aliases"], f"{provider_id}.aliases")
-    invalid_alias = any(not isinstance(alias, str) or not alias for alias in aliases)
-    if len(aliases) != len(set(aliases)) or invalid_alias:
+    validated_aliases = [
+        validate_model_id(alias, maximum_model_id_bytes, f"{provider_id}.aliases[{index}]")
+        for index, alias in enumerate(aliases)
+    ]
+    if len(validated_aliases) != len(set(validated_aliases)):
         raise CatalogError(f"{provider_id}.aliases is invalid")
+    curated["aliases"] = validated_aliases
 
     for collection in ("models", "additions"):
         records = require_array(curated[collection], f"{provider_id}.{collection}")
@@ -124,4 +190,10 @@ def load_curated(
     }
     if overlap:
         raise CatalogError(f"{provider_id} models and additions overlap")
+    model_ids = {
+        model["id"] for collection in ("models", "additions") for model in curated[collection]
+    }
+    alias_collisions = set(curated["aliases"]) & model_ids
+    if alias_collisions:
+        raise CatalogError(f"{provider_id} aliases duplicate model ids")
     return curated, raw

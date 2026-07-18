@@ -95,6 +95,7 @@
           "minimum": 1
         },
         "curated_model_count": {
+          "description": "Number of published records whose admission or metadata depends on curated input.",
           "type": "integer",
           "minimum": 0
         },
