@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from .common import CatalogError, atomic_write
+from .common import CatalogError, OBSERVED_DISCOVERY_KINDS, atomic_write
 from .config import SUPPORTED_PROVIDERS, load_policy
 from .observation import sidecar_bytes
 
@@ -21,15 +21,17 @@ def record(
     observed_at: str,
 ) -> None:
     provider_id = policy["provider_id"]
-    if policy["discovery"]["kind"] != "official_api":
-        raise CatalogError(f"{provider_id} has no official API observation")
+    if policy["discovery"]["kind"] not in OBSERVED_DISCOVERY_KINDS:
+        raise CatalogError(f"{provider_id} has no official structured observation")
     provider_dir = observations_dir / provider_id
     data = sidecar_bytes(provider_dir, policy, observed_at)
     atomic_write(provider_dir / "observation.json", data)
 
 
 def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Record digests for provider API response files")
+    parser = argparse.ArgumentParser(
+        description="Record digests for official provider source files"
+    )
     parser.add_argument("--provider", required=True, choices=(*SUPPORTED_PROVIDERS, "all"))
     parser.add_argument("--observations-dir", type=Path, required=True)
     parser.add_argument("--sources-dir", type=Path, default=Path("sources"))
@@ -46,7 +48,7 @@ def main() -> int:
     for provider_id in providers:
         try:
             policy, _ = load_policy(args.sources_dir, provider_id)
-            if policy["discovery"]["kind"] != "official_api":
+            if policy["discovery"]["kind"] not in OBSERVED_DISCOVERY_KINDS:
                 continue
             record(
                 policy=policy,
@@ -60,7 +62,7 @@ def main() -> int:
     if failures:
         print(f"observation recording failed for: {', '.join(failures)}")
         return 1
-    print(f"recorded {recorded} provider observations at {observed_at}")
+    print(f"recorded {recorded} official source observations at {observed_at}")
     return 0
 
 

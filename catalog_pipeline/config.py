@@ -5,6 +5,7 @@ from typing import Any
 
 from .common import (
     CatalogError,
+    OBSERVED_DISCOVERY_KINDS,
     PROVIDER_ID_PATTERN,
     REASONING_EFFORTS,
     read_json,
@@ -70,6 +71,12 @@ def _validate_filters(policy: dict[str, Any], provider_id: str) -> None:
             filters.get("required_supported_parameters"),
             f"{provider_id}.required_supported_parameters",
         )
+    if normalizer == "chatgpt":
+        _string_array(
+            filters.get("allowed_unobserved_model_ids", []),
+            f"{provider_id}.allowed_unobserved_model_ids",
+            allow_empty=True,
+        )
     if normalizer in {"anthropic", "openrouter"}:
         _validate_reasoning_policy(policy, provider_id)
 
@@ -83,14 +90,26 @@ def load_policy(sources_dir: Path, provider_id: str) -> tuple[dict[str, Any], by
         raise CatalogError(f"unsupported provider id: {provider_id}")
     require_string(policy.get("display_name"), f"{provider_id}.display_name")
     normalizer = require_string(policy.get("normalizer"), f"{provider_id}.normalizer")
-    if normalizer not in {"anthropic", "curated", "openai", "openrouter", "xai"}:
+    if normalizer not in {"anthropic", "chatgpt", "curated", "openai", "openrouter", "xai"}:
         raise CatalogError(f"{provider_id}.normalizer is unsupported")
+    if (normalizer == "chatgpt") != (provider_id == "chatgpt"):
+        raise CatalogError("the chatgpt normalizer is reserved for the chatgpt provider")
     require_string(policy.get("minimum_euler_version"), f"{provider_id}.minimum_euler_version")
     _validate_filters(policy, provider_id)
 
     discovery = require_object(policy.get("discovery"), f"{provider_id}.discovery")
-    if discovery.get("kind") not in {"official_api", "curated"}:
+    if discovery.get("kind") not in OBSERVED_DISCOVERY_KINDS | {"curated"}:
         raise CatalogError(f"{provider_id}.discovery.kind is invalid")
+    if normalizer == "curated":
+        expected_discovery_kind = "curated"
+    elif normalizer == "chatgpt":
+        expected_discovery_kind = "official_snapshot"
+    else:
+        expected_discovery_kind = "official_api"
+    if discovery["kind"] != expected_discovery_kind:
+        raise CatalogError(
+            f"{provider_id}.{normalizer} requires {expected_discovery_kind} discovery"
+        )
     endpoints = require_array(discovery.get("endpoints"), f"{provider_id}.discovery.endpoints")
     documentation = require_array(
         discovery.get("documentation_urls"), f"{provider_id}.discovery.documentation_urls"
@@ -100,10 +119,12 @@ def load_policy(sources_dir: Path, provider_id: str) -> tuple[dict[str, Any], by
     )
     if not documentation or invalid_documentation:
         raise CatalogError(f"{provider_id} must name official HTTPS documentation")
-    if discovery["kind"] == "official_api" and not endpoints:
-        raise CatalogError(f"{provider_id} must name an official API endpoint")
+    if discovery["kind"] in OBSERVED_DISCOVERY_KINDS and not endpoints:
+        raise CatalogError(f"{provider_id} must name an official structured source")
+    if discovery["kind"] == "official_snapshot" and len(endpoints) != 1:
+        raise CatalogError(f"{provider_id} official snapshot must name exactly one source")
     if discovery["kind"] == "curated" and endpoints:
-        raise CatalogError(f"{provider_id} curated discovery cannot name API endpoints")
+        raise CatalogError(f"{provider_id} curated discovery cannot name source endpoints")
 
     endpoint_ids: set[str] = set()
     endpoint_files: set[str] = set()

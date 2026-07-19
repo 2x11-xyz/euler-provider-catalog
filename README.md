@@ -20,7 +20,7 @@ into Euler:
 | `anthropic` | Official Models API | API capability and limit fields |
 | `openai` | Official Models API | API membership intersected with reviewed official-doc metadata |
 | `xai` | Official Models and Language Models APIs | Joined API fields plus narrow reviewed overrides |
-| `chatgpt` | No suitable public discovery API | Explicitly curated subscription routes |
+| `chatgpt` | Explicitly curated subscription routes | Matching context limits from OpenAI's bundled Codex model snapshot |
 
 This is an Euler-supported catalog, not a claim that every account sees every
 provider model. Account-scoped observations are evidence of availability;
@@ -28,7 +28,7 @@ publication policy decides whether a candidate is promoted.
 
 The repository layout keeps those decisions visible:
 
-- `sources/` records official endpoints, documentation, field ownership, and
+- `sources/` records official sources, documentation, field ownership, and
   provider-specific acceptance rules;
 - `curated/` records defaults and the narrow metadata that APIs do not expose;
 - `catalog_pipeline/` fetches bounded observations and generates artifacts;
@@ -75,9 +75,9 @@ Those keys are catalog-operator discovery credentials, not Euler user
 credentials and not catalog data. They are injected into the observation
 process, used only in request headers for official read-only model-list calls,
 and never written to observations, provenance, candidates, releases, or the
-Euler client. Providers without a suitable unauthenticated official endpoint
-must otherwise remain explicitly curated from official documentation; the
-pipeline does not fall back to scraping or secondary indexes.
+Euler client. Providers without a suitable official structured endpoint must
+otherwise remain explicitly curated from official documentation; the pipeline
+does not fall back to scraping or secondary indexes.
 
 Classify a complete candidate against the current stable release:
 
@@ -112,10 +112,12 @@ through reviewed promotion pull requests.
 
 ## Publication model
 
-GitHub Actions observes all four official discovery APIs daily and on manual
-dispatch, then combines those observations with the reviewed ChatGPT route
-list. A successful run retains the bounded evidence and candidate as a
-short-lived workflow artifact. A separate `workflow_run` job has no provider
+GitHub Actions observes four provider model APIs plus the model snapshot
+bundled in OpenAI's official Codex repository daily and on manual dispatch.
+ChatGPT membership remains reviewed; the snapshot supplies context limits only
+for matching routes. A
+successful run retains the bounded evidence and candidate as a short-lived
+workflow artifact. A separate `workflow_run` job has no provider
 credentials: it validates that artifact, applies the promotion policy, and
 updates one monotonic bot-owned branch under `stable/`. A no-change observation
 does nothing, and a blocked or incomplete candidate cannot update the branch.
@@ -146,10 +148,12 @@ manifest's release-specific URL. The release-specific hop makes a moving
 manifest. Euler packages the current stable snapshot and treats network
 refresh as a best-effort update, never as a startup dependency.
 
-The OpenAI and xAI observations are publication-safe projections of their
-official responses: only provider-owned model records are written to disk.
-Private fine-tune and organization-owned IDs are discarded in memory and never
-uploaded from this public repository's workflow.
+The OpenAI and xAI observations are publication-safe projections of official
+API responses and retain only provider-owned model records. The ChatGPT
+observation is a projection of an official repository snapshot; it retains
+only model slugs and context bounds and drops bundled prompts and client
+instructions. Private fine-tune and organization-owned IDs are discarded in
+memory and never uploaded from this public repository's workflow.
 
 Euler remains usable from its embedded last-known-good catalog when GitHub or
 an upstream provider is unavailable.

@@ -123,6 +123,20 @@ class PromotionTests(unittest.TestCase):
         provider = diff["providers"]["openrouter"]
         self.assertEqual(provider["metadata_changes"][0]["fields"], ["context_window_tokens"])
 
+    def test_chatgpt_context_change_requires_review(self) -> None:
+        def change_context(catalog: dict[str, Any]) -> None:
+            models = catalog["providers"]["chatgpt"]["models"]
+            sol = next(model for model in models if model["id"] == "gpt-5.6-sol")
+            sol["context_window_tokens"] += 1
+
+        candidate = changed_release(self.release, catalog_change=change_context)
+        diff = classify_promotion(self.release, candidate, self.policy)
+        self.assertEqual(diff["decision"], "review_required")
+        self.assertEqual(diff["reasons"], ["model_metadata_changed"])
+        changes = diff["providers"]["chatgpt"]["metadata_changes"]
+        self.assertEqual(changes[0]["id"], "gpt-5.6-sol")
+        self.assertEqual(changes[0]["fields"], ["context_window_tokens"])
+
     def test_small_removal_requires_review(self) -> None:
         def remove_model(catalog: dict[str, Any]) -> None:
             provider = catalog["providers"]["xai"]
@@ -313,6 +327,39 @@ class PromotionTests(unittest.TestCase):
                         (candidate / name).write_bytes(data)
                     with self.assertRaisesRegex(CatalogError, "provenance input is invalid"):
                         load_release(candidate)
+
+    def test_release_loader_accepts_prior_curated_chatgpt_provenance(self) -> None:
+        def restore_curated(provenance: dict[str, Any]) -> None:
+            provider = provenance["providers"]["chatgpt"]
+            provider["discovery_kind"] = "curated"
+            provider["inputs"] = [
+                item for item in provider["inputs"] if item["kind"] in {"curated", "source_policy"}
+            ]
+            provider["observed_model_count"] = 0
+
+        legacy = changed_release(self.release, provenance_change=restore_curated)
+        with tempfile.TemporaryDirectory() as temporary:
+            candidate = Path(temporary) / "candidate"
+            candidate.mkdir()
+            for name, data in legacy.encoded.items():
+                (candidate / name).write_bytes(data)
+            loaded = load_release(candidate)
+            self.assertEqual(loaded.provenance["providers"]["chatgpt"]["discovery_kind"], "curated")
+
+    def test_release_loader_rejects_mixed_snapshot_and_api_provenance(self) -> None:
+        def mix_kinds(provenance: dict[str, Any]) -> None:
+            inputs = provenance["providers"]["chatgpt"]["inputs"]
+            observation = next(item for item in inputs if item["kind"] == "official_snapshot")
+            observation["kind"] = "official_api"
+
+        mixed = changed_release(self.release, provenance_change=mix_kinds)
+        with tempfile.TemporaryDirectory() as temporary:
+            candidate = Path(temporary) / "candidate"
+            candidate.mkdir()
+            for name, data in mixed.encoded.items():
+                (candidate / name).write_bytes(data)
+            with self.assertRaisesRegex(CatalogError, "discovery inputs are inconsistent"):
+                load_release(candidate)
 
     def test_blocked_cli_returns_nonzero_and_retains_the_diff(self) -> None:
         def remove_model(catalog: dict[str, Any]) -> None:

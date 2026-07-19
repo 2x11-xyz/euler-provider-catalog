@@ -10,6 +10,7 @@ from typing import Any
 from . import __version__
 from .common import (
     CatalogError,
+    OBSERVED_DISCOVERY_KINDS,
     catalog_release_id,
     canonical_json_bytes,
     sha256_hex,
@@ -87,7 +88,7 @@ def generate_artifacts(
         policy, policy_raw = load_policy(sources_dir, provider_id)
         curated, curated_raw = load_curated(curated_dir, provider_id, policy["limits"])
         discovery = policy["discovery"]
-        if discovery["kind"] == "official_api":
+        if discovery["kind"] in OBSERVED_DISCOVERY_KINDS:
             payloads, observed_at, evidence = load_observation(observations_dir, policy)
         else:
             payloads = {}

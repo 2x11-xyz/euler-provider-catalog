@@ -9,7 +9,9 @@ list on a user's machine.
 Status: implemented by pull request 1.
 
 - Observe the official OpenRouter, Anthropic, OpenAI, and xAI model APIs.
-- Keep the ChatGPT subscription route list explicitly reviewed.
+- Keep ChatGPT subscription membership explicitly reviewed while observing
+  matching context limits from the snapshot bundled in OpenAI's public Codex
+  repository.
 - Normalize all five Euler routes into one deterministic catalog.
 - Retain bounded observations and a candidate as short-lived workflow
   artifacts.

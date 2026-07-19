@@ -5,6 +5,7 @@ from typing import Any
 
 from .common import (
     CatalogError,
+    OBSERVED_DISCOVERY_KINDS,
     canonical_json_bytes,
     read_json,
     require_array,
@@ -18,6 +19,9 @@ def load_observation(
     observations_dir: Path, policy: dict[str, Any]
 ) -> tuple[dict[str, Any], str, list[dict[str, Any]]]:
     provider_id = policy["provider_id"]
+    discovery_kind = policy["discovery"]["kind"]
+    if discovery_kind not in OBSERVED_DISCOVERY_KINDS:
+        raise CatalogError(f"{provider_id} has no official structured observation")
     provider_dir = observations_dir / provider_id
     sidecar, _ = read_json(provider_dir / "observation.json", max_bytes=128 * 1024)
     sidecar = require_object(sidecar, f"{provider_id}/observation.json")
@@ -64,7 +68,7 @@ def load_observation(
         payloads[endpoint_id] = payload
         evidence.append(
             {
-                "kind": "official_api",
+                "kind": discovery_kind,
                 "path": f"observations/{provider_id}/{entry['file']}",
                 "source_url": entry["source_url"],
                 "bytes": len(raw),

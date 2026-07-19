@@ -121,7 +121,7 @@
           "supports_tools": true
         },
         {
-          "context_window_tokens": 372000,
+          "context_window_tokens": 272000,
           "display_name": "GPT-5.6 Luna",
           "id": "gpt-5.6-luna",
           "max_output_tokens": 128000,
@@ -138,7 +138,7 @@
           "supports_tools": true
         },
         {
-          "context_window_tokens": 372000,
+          "context_window_tokens": 272000,
           "display_name": "GPT-5.6 Sol",
           "id": "gpt-5.6-sol",
           "max_output_tokens": 128000,
@@ -155,7 +155,7 @@
           "supports_tools": true
         },
         {
-          "context_window_tokens": 372000,
+          "context_window_tokens": 272000,
           "display_name": "GPT-5.6 Terra",
           "id": "gpt-5.6-terra",
           "max_output_tokens": 128000,

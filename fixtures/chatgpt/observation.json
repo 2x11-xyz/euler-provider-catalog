@@ -1,0 +1,14 @@
+{
+  "inputs": [
+    {
+      "bytes": 893,
+      "endpoint_id": "models",
+      "file": "models.json",
+      "sha256": "8b35a263f13842d9a6ecb8b26b224b4714beefe0c6526a8964c6fe54a72c9c7d",
+      "source_url": "https://raw.githubusercontent.com/openai/codex/main/codex-rs/models-manager/models.json"
+    }
+  ],
+  "observed_at": "2026-07-19T00:00:00Z",
+  "provider_id": "chatgpt",
+  "schema_version": 1
+}
