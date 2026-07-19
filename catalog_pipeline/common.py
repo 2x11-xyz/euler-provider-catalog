@@ -46,6 +46,11 @@ def catalog_release_id(
     minimum_euler_version: str,
     artifacts: dict[str, Any],
 ) -> str:
+    # Wire-format invariant shared with Euler's provider_catalog::release_id:
+    # identity keys (including nested artifact keys) are lexicographically
+    # sorted, JSON uses ensure_ascii=False and two-space indentation, and one
+    # trailing LF is hashed. Changing these canonical_json_bytes settings is a
+    # catalog protocol change that must be coordinated across both repositories.
     timestamp = datetime.fromisoformat(generated_at[:-1] + "+00:00")
     identity = {
         "artifacts": artifacts,
