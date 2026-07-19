@@ -1,10 +1,10 @@
 {
   "inputs": [
     {
-      "bytes": 2346,
+      "bytes": 2747,
       "endpoint_id": "models",
       "file": "models.json",
-      "sha256": "c72dcd67a2c25c66a5482225b7d91d0392eb7558eb0391b7c4be73c89c75098d",
+      "sha256": "20786e394a164665a684522fd1e55f9ae2a0c0fb7f552060ad9b05aad05f22ef",
       "source_url": "https://openrouter.ai/api/v1/models"
     }
   ],

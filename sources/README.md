@@ -34,6 +34,13 @@ Human-readable pages back structured review but are never scraped to mutate a
 stable catalog. An unknown or incomplete API record is skipped with provenance,
 not filled by an undocumented guess.
 
+Price schedules are optional metadata with independent field ownership.
+Router-published pricing is official for router routes. For providers whose
+model API omits prices, reviewed exact rates live only in the curated
+`pricing` map and cite that provider's official pricing page here. Curated
+prices never replace a conflicting official API price, and absent prices stay
+absent.
+
 Because this is a public repository, account-scoped APIs are projected before
 their response is written. For OpenAI and xAI, only records owned by the
 provider are retained; private fine-tunes and organization-owned model IDs

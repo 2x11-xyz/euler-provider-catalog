@@ -76,6 +76,107 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(provenance["skipped"]["tools_not_supported"], 1)
         self.assertEqual(provenance["skipped"]["text_output_not_supported"], 1)
 
+    def test_openrouter_publishes_exact_official_api_prices(self) -> None:
+        models = {
+            model["id"]: model
+            for model in generate().documents["catalog-v1.json"]["providers"]["openrouter"][
+                "models"
+            ]
+        }
+        self.assertEqual(
+            models["moonshotai/kimi-k3"]["cost"],
+            {"input": 3, "output": 15, "cache_read": 0.3},
+        )
+        self.assertEqual(
+            models["thinkingmachines/inkling"]["cost"],
+            {"input": 1, "output": 4.05, "cache_read": 0.17},
+        )
+
+    def test_reviewed_prices_include_tiers_and_cache_write_rates(self) -> None:
+        catalog = generate().documents["catalog-v1.json"]["providers"]
+        chatgpt = {model["id"]: model for model in catalog["chatgpt"]["models"]}
+        anthropic = {model["id"]: model for model in catalog["anthropic"]["models"]}
+
+        sol = chatgpt["gpt-5.6-sol"]["cost"]
+        self.assertEqual(sol["cache_write_5m"], 6.25)
+        self.assertEqual(sol["tiers"][0]["input_tokens_above"], 272000)
+        self.assertEqual(sol["tiers"][0]["cache_write_5m"], 12.5)
+        self.assertEqual(
+            anthropic["claude-sonnet-5"]["cost"],
+            {
+                "input": 2,
+                "output": 10,
+                "cache_read": 0.2,
+                "cache_write_5m": 2.5,
+                "cache_write_1h": 4,
+            },
+        )
+
+    def test_official_router_prices_outrank_curated_fallbacks(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            curated = Path(temporary) / "curated"
+            shutil.copytree(ROOT / "curated", curated)
+            path = curated / "openrouter.json"
+            payload = json.loads(path.read_bytes())
+            payload["pricing"]["moonshotai/kimi-k3"] = {"input": 99, "output": 99}
+            path.write_bytes(canonical_json_bytes(payload))
+
+            artifacts = generate(curated=curated).documents
+            models = {
+                model["id"]: model
+                for model in artifacts["catalog-v1.json"]["providers"]["openrouter"]["models"]
+            }
+            self.assertEqual(models["moonshotai/kimi-k3"]["cost"]["input"], 3)
+            warnings = artifacts["provenance-v1.json"]["providers"]["openrouter"]["warnings"]
+            self.assertIn(
+                "1 curated price records disagreed with official prices; official values won",
+                warnings,
+            )
+
+    def test_malformed_curated_prices_fail_closed(self) -> None:
+        malformed = (
+            ({"input": 1}, "missing fields"),
+            ({"input": 0.1234567, "output": 1}, "six decimal places"),
+            ({"input": 1, "output": 1, "surprise": 1}, "unknown fields"),
+            (
+                {
+                    "input": 1,
+                    "output": 1,
+                    "tiers": [
+                        {"input_tokens_above": 10, "input": 2, "output": 2},
+                        {"input_tokens_above": 10, "input": 3, "output": 3},
+                    ],
+                },
+                "thresholds must be positive and ascending",
+            ),
+        )
+        for cost, message in malformed:
+            with self.subTest(message=message), tempfile.TemporaryDirectory() as temporary:
+                curated = Path(temporary) / "curated"
+                shutil.copytree(ROOT / "curated", curated)
+                path = curated / "openai.json"
+                payload = json.loads(path.read_bytes())
+                payload["pricing"]["gpt-5.5"] = cost
+                path.write_bytes(canonical_json_bytes(payload))
+                with self.assertRaisesRegex(CatalogError, message):
+                    generate(curated=curated)
+
+    def test_malformed_official_router_prices_fail_closed(self) -> None:
+        for value, message in (
+            ("not-a-decimal", "decimal string"),
+            ("0.0000001234567", "more precision than Euler can publish"),
+        ):
+            with self.subTest(value=value), tempfile.TemporaryDirectory() as temporary:
+                fixtures = Path(temporary) / "fixtures"
+                shutil.copytree(ROOT / "fixtures", fixtures)
+                path = fixtures / "openrouter" / "models.json"
+                payload = json.loads(path.read_bytes())
+                payload["data"][0]["pricing"]["prompt"] = value
+                path.write_bytes(canonical_json_bytes(payload))
+                refresh_sidecar(fixtures, "openrouter")
+                with self.assertRaisesRegex(CatalogError, message):
+                    generate(fixtures)
+
     def test_curated_router_routes_are_fallbacks_when_api_starts_listing_them(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             fixtures = Path(temporary) / "fixtures"
@@ -247,6 +348,10 @@ class PipelineTests(unittest.TestCase):
             data = artifacts.encoded[name]
             self.assertEqual(expected["bytes"], len(data))
             self.assertEqual(expected["sha256"], hashlib.sha256(data).hexdigest())
+
+    def test_pricing_schema_requires_a_compatible_euler_release(self) -> None:
+        manifest = generate().documents["manifest-v1.json"]
+        self.assertEqual(manifest["minimum_euler_version"], "0.1.2")
 
     def test_identical_inputs_are_deterministic(self) -> None:
         first = generate().encoded

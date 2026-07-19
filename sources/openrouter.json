@@ -3,7 +3,7 @@
   "provider_id": "openrouter",
   "display_name": "OpenRouter",
   "normalizer": "openrouter",
-  "minimum_euler_version": "0.1.1",
+  "minimum_euler_version": "0.1.2",
   "discovery": {
     "kind": "official_api",
     "endpoints": [
@@ -27,7 +27,8 @@
     "supports_reasoning": "official_api reasoning metadata",
     "reasoning_efforts": "official_api.data[].reasoning.supported_efforts",
     "default_model": "euler_curated",
-    "router_pseudo_models": "euler_curated"
+    "router_pseudo_models": "euler_curated",
+    "cost": "official_api.data[].pricing"
   },
   "filters": {
     "required_supported_parameters": [

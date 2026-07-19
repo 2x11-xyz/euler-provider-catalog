@@ -5,6 +5,7 @@ import json
 import os
 import re
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
@@ -19,9 +20,16 @@ MODEL_REQUIRED_FIELDS = {
     "supports_reasoning",
     "reasoning_efforts",
 }
-MODEL_OPTIONAL_FIELDS = {"max_output_tokens"}
+MODEL_OPTIONAL_FIELDS = {"cost", "max_output_tokens"}
 MODEL_METADATA_FIELDS = tuple(
     sorted((MODEL_REQUIRED_FIELDS | MODEL_OPTIONAL_FIELDS) - {"id", "status"})
+)
+PRICE_RATE_FIELDS = (
+    "input",
+    "output",
+    "cache_read",
+    "cache_write_5m",
+    "cache_write_1h",
 )
 PROVIDER_ID_PATTERN = re.compile(r"^[a-z][a-z0-9-]{0,63}$")
 RELEASE_ID_PATTERN = re.compile(r"^catalog-v1-[0-9]{8}t[0-9]{6}z-[a-f0-9]{64}$")
@@ -101,6 +109,80 @@ def positive_int(value: Any) -> int | None:
     return None
 
 
+def _price_decimal(value: Any, scope: str) -> Decimal:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise CatalogError(f"{scope} must be a non-negative JSON number")
+    try:
+        decimal = Decimal(str(value))
+    except InvalidOperation as error:
+        raise CatalogError(f"{scope} must be a non-negative JSON number") from error
+    if not decimal.is_finite() or decimal < 0 or decimal > Decimal("1000000"):
+        raise CatalogError(f"{scope} is out of bounds")
+    if decimal != decimal.quantize(Decimal("0.000001")):
+        raise CatalogError(f"{scope} must have at most six decimal places")
+    return decimal
+
+
+def _canonical_price_number(value: Any, scope: str) -> int | float:
+    decimal = _price_decimal(value, scope)
+    if decimal == decimal.to_integral():
+        return int(decimal)
+    number = float(decimal)
+    if Decimal(str(number)) != decimal:
+        raise CatalogError(f"{scope} cannot be represented canonically")
+    return number
+
+
+def validate_cost(value: Any, scope: str) -> dict[str, Any]:
+    cost = require_object(value, scope)
+    allowed = set(PRICE_RATE_FIELDS) | {"tiers"}
+    unknown = set(cost) - allowed
+    missing = {"input", "output"} - set(cost)
+    if missing:
+        raise CatalogError(f"{scope} is missing fields: {', '.join(sorted(missing))}")
+    if unknown:
+        raise CatalogError(f"{scope} has unknown fields: {', '.join(sorted(unknown))}")
+    normalized = {
+        field: _canonical_price_number(cost[field], f"{scope}.{field}")
+        for field in PRICE_RATE_FIELDS
+        if field in cost
+    }
+    if "tiers" not in cost:
+        return normalized
+    tiers = require_array(cost["tiers"], f"{scope}.tiers")
+    if len(tiers) > 16:
+        raise CatalogError(f"{scope}.tiers has too many entries")
+    normalized_tiers = []
+    previous = 0
+    for index, value in enumerate(tiers):
+        tier_scope = f"{scope}.tiers[{index}]"
+        tier = require_object(value, tier_scope)
+        allowed_tier = set(PRICE_RATE_FIELDS) | {"input_tokens_above"}
+        unknown_tier = set(tier) - allowed_tier
+        missing_tier = {"input_tokens_above", "input", "output"} - set(tier)
+        if missing_tier:
+            raise CatalogError(f"{tier_scope} is missing fields: {', '.join(sorted(missing_tier))}")
+        if unknown_tier:
+            raise CatalogError(
+                f"{tier_scope} has unknown fields: {', '.join(sorted(unknown_tier))}"
+            )
+        threshold = positive_int(tier["input_tokens_above"])
+        if threshold is None or threshold <= previous:
+            raise CatalogError(f"{scope}.tiers thresholds must be positive and ascending")
+        previous = threshold
+        normalized_tier = {
+            "input_tokens_above": threshold,
+            **{
+                field: _canonical_price_number(tier[field], f"{tier_scope}.{field}")
+                for field in PRICE_RATE_FIELDS
+                if field in tier
+            },
+        }
+        normalized_tiers.append(normalized_tier)
+    normalized["tiers"] = normalized_tiers
+    return normalized
+
+
 def validate_timestamp(value: Any, scope: str) -> str:
     timestamp = require_string(value, scope)
     if not timestamp.endswith("Z"):
@@ -172,6 +254,8 @@ def validate_model(model: Any, limits: dict[str, Any], scope: str) -> dict[str, 
         output = positive_int(record["max_output_tokens"])
         if output is None or output > token_limit:
             raise CatalogError(f"{scope}.max_output_tokens is invalid")
+    if "cost" in record:
+        record["cost"] = validate_cost(record["cost"], f"{scope}.cost")
     if record["supports_tools"] is not True:
         raise CatalogError(f"{scope}.supports_tools must be true")
     if not isinstance(record["supports_reasoning"], bool):

@@ -3,7 +3,7 @@
   "provider_id": "openai",
   "display_name": "OpenAI",
   "normalizer": "openai",
-  "minimum_euler_version": "0.1.1",
+  "minimum_euler_version": "0.1.2",
   "discovery": {
     "kind": "official_api",
     "endpoints": [
@@ -15,7 +15,8 @@
     ],
     "documentation_urls": [
       "https://platform.openai.com/docs/api-reference/models/list",
-      "https://developers.openai.com/api/docs/models"
+      "https://developers.openai.com/api/docs/models",
+      "https://developers.openai.com/api/docs/pricing"
     ]
   },
   "field_ownership": {
@@ -27,7 +28,8 @@
     "supports_tools": "official_model_documentation",
     "supports_reasoning": "official_model_documentation",
     "reasoning_efforts": "official_model_documentation",
-    "default_model": "euler_curated"
+    "default_model": "euler_curated",
+    "cost": "official_pricing_documentation recorded in euler_curated pricing metadata"
   },
   "filters": {
     "required_object_type": "model",

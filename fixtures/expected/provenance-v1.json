@@ -2,7 +2,7 @@
   "generated_at": "2026-07-18T00:00:00Z",
   "generator": {
     "name": "euler-provider-catalog",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "providers": {
     "anthropic": {
@@ -10,15 +10,16 @@
       "discovery_kind": "official_api",
       "documentation_urls": [
         "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "https://platform.claude.com/docs/en/about-claude/pricing",
         "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview",
         "https://platform.claude.com/docs/en/api/models/list"
       ],
       "inputs": [
         {
-          "bytes": 226,
+          "bytes": 2410,
           "kind": "curated",
           "path": "curated/anthropic.json",
-          "sha256": "3c5f5cb2a69dc0a8cd001eab75cbe618e8e196d030fdd295c41df2e7ecce0118"
+          "sha256": "cb61fcc31d233b9aa0ae91e35bfdb89ba4a160225ab6c99bcc46690a1fb989cf"
         },
         {
           "bytes": 2865,
@@ -28,10 +29,10 @@
           "source_url": "https://api.anthropic.com/v1/models?limit=1000"
         },
         {
-          "bytes": 1791,
+          "bytes": 1946,
           "kind": "source_policy",
           "path": "sources/anthropic.json",
-          "sha256": "9d508ef78be4acd4d10a6a3091526d13f66603e19e5a8553115240a2f1313c54"
+          "sha256": "f8a635b480469527f4655b57d31c01f973b19bc763be44a95fb28d0f4e3e248b"
         }
       ],
       "observed_at": "2026-07-18T00:00:00Z",
@@ -40,26 +41,29 @@
       "skipped": {
         "unsupported_object_type": 1
       },
-      "warnings": []
+      "warnings": [
+        "11 curated price records had no published model"
+      ]
     },
     "chatgpt": {
       "curated_model_count": 7,
       "discovery_kind": "curated",
       "documentation_urls": [
+        "https://developers.openai.com/api/docs/pricing",
         "https://developers.openai.com/codex/models"
       ],
       "inputs": [
         {
-          "bytes": 2826,
+          "bytes": 4658,
           "kind": "curated",
           "path": "curated/chatgpt.json",
-          "sha256": "8c64cb9f75f48fccd6276619665627d3678c1e62957546bc991fedaad4578b18"
+          "sha256": "05ab0f6b4c43b1eec4fbbbc779ad852a687d3dd838515eb144935eff834749e2"
         },
         {
-          "bytes": 1105,
+          "bytes": 1252,
           "kind": "source_policy",
           "path": "sources/chatgpt.json",
-          "sha256": "f626ef0497ae382f3d238c4c78f67a916ee1a6f296a37040afbe5377bdc002ef"
+          "sha256": "b6e7cca2228eebcaada2342df89eaf188b20d0ebd06636ff5e34075fcf750f7a"
         }
       ],
       "observed_at": "2026-07-18T00:00:00Z",
@@ -75,14 +79,15 @@
       "discovery_kind": "official_api",
       "documentation_urls": [
         "https://developers.openai.com/api/docs/models",
+        "https://developers.openai.com/api/docs/pricing",
         "https://platform.openai.com/docs/api-reference/models/list"
       ],
       "inputs": [
         {
-          "bytes": 3426,
+          "bytes": 5488,
           "kind": "curated",
           "path": "curated/openai.json",
-          "sha256": "0a944f9cd14b6208a68e683baa2d1bd0389f699a312d8b679d344f2e3ba906de"
+          "sha256": "12d8ddc30563670bedc3571d5a81190c78eb031d5eaaff0e57aebcddf2ca6b1d"
         },
         {
           "bytes": 1252,
@@ -92,10 +97,10 @@
           "source_url": "https://api.openai.com/v1/models"
         },
         {
-          "bytes": 1605,
+          "bytes": 1750,
           "kind": "source_policy",
           "path": "sources/openai.json",
-          "sha256": "f081fa9adf91bae07b539f02d24e027e27f93b0860eb4b3d72c75ec396dda46a"
+          "sha256": "9e44f4a1ed91f4e4d72aad549266e89cf28f188ec1567ce52af10707b317a4a4"
         }
       ],
       "observed_at": "2026-07-18T00:00:00Z",
@@ -116,23 +121,23 @@
       ],
       "inputs": [
         {
-          "bytes": 1353,
+          "bytes": 1370,
           "kind": "curated",
           "path": "curated/openrouter.json",
-          "sha256": "8e307cb64417816c0babd507327bdc1f1517600040783e4daf5cf3b062213f28"
+          "sha256": "e9c458b1a8cd0afaeb8fc24fa9ca85c8fb35e46648be59e7ba5367bf11f1d929"
         },
         {
-          "bytes": 2346,
+          "bytes": 2747,
           "kind": "official_api",
           "path": "observations/openrouter/models.json",
-          "sha256": "c72dcd67a2c25c66a5482225b7d91d0392eb7558eb0391b7c4be73c89c75098d",
+          "sha256": "20786e394a164665a684522fd1e55f9ae2a0c0fb7f552060ad9b05aad05f22ef",
           "source_url": "https://openrouter.ai/api/v1/models"
         },
         {
-          "bytes": 1722,
+          "bytes": 1765,
           "kind": "source_policy",
           "path": "sources/openrouter.json",
-          "sha256": "87122d507d345ab55d78e269c5c9394ecdbf076b7295ef00398dfa5fc003b218"
+          "sha256": "c5f27e8f4c1ed7be4d1bb62a2a445f91b27c1bfde0403930eee094f1b0c0c91f"
         }
       ],
       "observed_at": "2026-07-18T00:00:00Z",
@@ -156,10 +161,10 @@
       ],
       "inputs": [
         {
-          "bytes": 2807,
+          "bytes": 2824,
           "kind": "curated",
           "path": "curated/xai.json",
-          "sha256": "ad28cc48cbea5ce4ce27698281a710f8131ecea2c1abbdd911d35a7a247979fc"
+          "sha256": "381d4381a8def4ea8b7c49bcfebe044ada4512ace7facf27acb985848bb36f6e"
         },
         {
           "bytes": 2379,

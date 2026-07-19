@@ -110,6 +110,9 @@
           "minimum": 1,
           "maximum": 20000000
         },
+        "cost": {
+          "$ref": "#/$defs/cost"
+        },
         "supports_tools": {
           "const": true
         },
@@ -172,6 +175,74 @@
           }
         }
       ]
+    },
+    "cost_rate": {
+      "description": "USD per one million tokens; pipeline validation additionally limits precision to six decimal places.",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "$ref": "#/$defs/cost_rate"
+        },
+        "output": {
+          "$ref": "#/$defs/cost_rate"
+        },
+        "cache_read": {
+          "$ref": "#/$defs/cost_rate"
+        },
+        "cache_write_5m": {
+          "$ref": "#/$defs/cost_rate"
+        },
+        "cache_write_1h": {
+          "$ref": "#/$defs/cost_rate"
+        },
+        "tiers": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/cost_tier"
+          }
+        }
+      }
+    },
+    "cost_tier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_tokens_above",
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input_tokens_above": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "input": {
+          "$ref": "#/$defs/cost_rate"
+        },
+        "output": {
+          "$ref": "#/$defs/cost_rate"
+        },
+        "cache_read": {
+          "$ref": "#/$defs/cost_rate"
+        },
+        "cache_write_5m": {
+          "$ref": "#/$defs/cost_rate"
+        },
+        "cache_write_1h": {
+          "$ref": "#/$defs/cost_rate"
+        }
+      }
     }
   }
 }
