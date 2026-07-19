@@ -7,6 +7,7 @@ from typing import Any
 
 from .common import (
     CatalogError,
+    OBSERVED_DISCOVERY_KINDS,
     PROVIDER_ID_PATTERN,
     RELEASE_ID_PATTERN,
     catalog_release_id,
@@ -56,6 +57,33 @@ def _valid_provenance_path(path: str, provider_id: str, kind: str) -> bool:
     if kind == "bootstrap":
         return path in {"bootstrap/catalog-v1.json", "bootstrap/metadata-v1.json"}
     return len(parsed.parts) == 3 and parsed.parts[:2] == ("observations", provider_id)
+
+
+def _provenance_inputs_match_discovery(
+    discovery_kind: str, kinds: list[str], input_paths: list[str]
+) -> bool:
+    observed = [kind for kind in kinds if kind in OBSERVED_DISCOVERY_KINDS]
+    if discovery_kind in OBSERVED_DISCOVERY_KINDS:
+        return (
+            bool(observed)
+            and set(observed) == {discovery_kind}
+            and kinds.count("source_policy") == 1
+            and kinds.count("curated") == 1
+            and "bootstrap" not in kinds
+        )
+    if discovery_kind == "curated":
+        return (
+            not observed
+            and kinds.count("source_policy") == 1
+            and kinds.count("curated") == 1
+            and "bootstrap" not in kinds
+        )
+    if discovery_kind == "bootstrap":
+        return kinds == ["bootstrap", "bootstrap"] and set(input_paths) == {
+            "bootstrap/catalog-v1.json",
+            "bootstrap/metadata-v1.json",
+        }
+    return False
 
 
 def _directory_entries(directory: Path) -> set[str]:
@@ -178,7 +206,7 @@ def _validate_provenance(
         if set(provider) != expected:
             raise CatalogError(f"{provider_id} provenance has an invalid shape")
         discovery_kind = provider["discovery_kind"]
-        if discovery_kind not in {"official_api", "curated", "bootstrap"}:
+        if discovery_kind not in OBSERVED_DISCOVERY_KINDS | {"curated", "bootstrap"}:
             raise CatalogError(f"{provider_id} provenance discovery kind is invalid")
         documentation = require_array(
             provider["documentation_urls"],
@@ -215,8 +243,8 @@ def _validate_provenance(
             byte_count = entry["bytes"]
             digest = entry["sha256"]
             invalid = (
-                kind not in {"official_api", "bootstrap", "curated", "source_policy"}
-                or ("source_url" in entry) != (kind == "official_api")
+                kind not in OBSERVED_DISCOVERY_KINDS | {"bootstrap", "curated", "source_policy"}
+                or ("source_url" in entry) != (kind in OBSERVED_DISCOVERY_KINDS)
                 or not isinstance(entry["path"], str)
                 or not entry["path"]
                 or len(entry["path"]) > 256
@@ -240,34 +268,7 @@ def _validate_provenance(
             input_paths.append(entry["path"])
         if len(input_paths) != len(set(input_paths)):
             raise CatalogError(f"{provider_id} provenance input paths are duplicated")
-        discovery_inputs_are_invalid = (
-            (
-                discovery_kind == "official_api"
-                and (
-                    kinds.count("official_api") < 1
-                    or kinds.count("source_policy") != 1
-                    or kinds.count("curated") != 1
-                    or "bootstrap" in kinds
-                )
-            )
-            or (
-                discovery_kind == "curated"
-                and (
-                    kinds.count("source_policy") != 1
-                    or kinds.count("curated") != 1
-                    or any(kind in kinds for kind in ("official_api", "bootstrap"))
-                )
-            )
-            or (
-                discovery_kind == "bootstrap"
-                and (
-                    kinds != ["bootstrap", "bootstrap"]
-                    or set(input_paths)
-                    != {"bootstrap/catalog-v1.json", "bootstrap/metadata-v1.json"}
-                )
-            )
-        )
-        if discovery_inputs_are_invalid:
+        if not _provenance_inputs_match_discovery(discovery_kind, kinds, input_paths):
             raise CatalogError(f"{provider_id} provenance discovery inputs are inconsistent")
         skipped = require_object(provider["skipped"], f"{provider_id}.skipped")
         invalid_skipped = any(

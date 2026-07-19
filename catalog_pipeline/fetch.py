@@ -9,13 +9,20 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from .common import CatalogError, atomic_write, canonical_json_bytes, is_provider_owned_record
+from .common import (
+    CatalogError,
+    OBSERVED_DISCOVERY_KINDS,
+    atomic_write,
+    canonical_json_bytes,
+    is_provider_owned_record,
+)
 from .config import SUPPORTED_PROVIDERS, load_policy
 from .record_observation import record
 
 
-AUTH_ENV = {
+AUTH_ENV: dict[str, str | None] = {
     "anthropic": "ANTHROPIC_API_KEY",
+    "chatgpt": None,
     "openai": "OPENAI_API_KEY",
     "openrouter": "OPENROUTER_API_KEY",
     "xai": "XAI_API_KEY",
@@ -45,6 +52,8 @@ def _headers(provider_id: str) -> dict[str, str]:
         "User-Agent": "euler-provider-catalog/0.1",
     }
     env_name = AUTH_ENV[provider_id]
+    if env_name is None:
+        return headers
     secret = os.environ.get(env_name)
     if provider_id == "openrouter" and not secret:
         return headers
@@ -93,6 +102,27 @@ def _public_projection(
     raw: bytes,
     filters: dict[str, Any],
 ) -> bytes:
+    if provider_id == "chatgpt":
+        records = payload.get("models")
+        if not isinstance(records, list):
+            raise CatalogError("chatgpt official catalog is missing models")
+        # Preserve a null sentinel for non-object entries so projection cannot
+        # hide malformed upstream cardinality from normalization/provenance.
+        projected_records: list[dict[str, Any] | None] = []
+        for model_record in records:
+            if not isinstance(model_record, dict):
+                projected_records.append(None)
+                continue
+            projection: dict[str, Any] = {}
+            slug = model_record.get("slug")
+            if isinstance(slug, str):
+                projection["slug"] = slug
+            for field in ("context_window", "max_context_window"):
+                value = model_record.get(field)
+                if isinstance(value, int) and not isinstance(value, bool):
+                    projection[field] = value
+            projected_records.append(projection)
+        return canonical_json_bytes({"models": projected_records})
     if provider_id not in {"openai", "xai"}:
         return raw
     collection_name = "models" if endpoint_id == "language-models" else "data"
@@ -110,8 +140,8 @@ def _public_projection(
 
 def fetch_provider(*, policy: dict[str, Any], observations_dir: Path, observed_at: str) -> None:
     provider_id = policy["provider_id"]
-    if policy["discovery"]["kind"] != "official_api":
-        raise CatalogError(f"{provider_id} has no official API observation")
+    if policy["discovery"]["kind"] not in OBSERVED_DISCOVERY_KINDS:
+        raise CatalogError(f"{provider_id} has no official structured observation")
     provider_dir = observations_dir / provider_id
     provider_dir.mkdir(parents=True, exist_ok=True)
     headers = _headers(provider_id)
@@ -132,7 +162,7 @@ def fetch_provider(*, policy: dict[str, Any], observations_dir: Path, observed_a
 
 
 def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Fetch bounded official provider model lists")
+    parser = argparse.ArgumentParser(description="Fetch bounded official provider model metadata")
     parser.add_argument("--provider", required=True, choices=(*SUPPORTED_PROVIDERS, "all"))
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--sources-dir", type=Path, default=Path("sources"))
@@ -148,7 +178,7 @@ def main() -> int:
     for provider_id in providers:
         try:
             policy, _ = load_policy(args.sources_dir, provider_id)
-            if policy["discovery"]["kind"] != "official_api":
+            if policy["discovery"]["kind"] not in OBSERVED_DISCOVERY_KINDS:
                 continue
             fetch_provider(
                 policy=policy,
@@ -162,7 +192,7 @@ def main() -> int:
     if failures:
         print(f"provider observation failed for: {', '.join(failures)}")
         return 1
-    print(f"recorded {observed} official provider observations at {observed_at}")
+    print(f"recorded {observed} official source observations at {observed_at}")
     return 0
 
 

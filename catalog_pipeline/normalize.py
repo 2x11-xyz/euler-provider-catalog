@@ -456,6 +456,99 @@ def _xai(
     )
 
 
+def _chatgpt(
+    policy: dict[str, Any], curated: dict[str, Any], payloads: dict[str, Any]
+) -> NormalizationResult:
+    if curated["membership_policy"] != "curated_only" or curated["additions"]:
+        raise CatalogError("chatgpt requires curated membership plus official metadata")
+    payload = require_object(payloads["models"], "chatgpt.models response")
+    records = require_array(payload.get("models"), "chatgpt.models")
+    reviewed = {model["id"]: model for model in curated["models"]}
+    observed_contexts: dict[str, int] = {}
+    skipped: dict[str, int] = {}
+    seen: set[str] = set()
+
+    for value in records:
+        if not isinstance(value, dict):
+            _increment(skipped, "malformed_record")
+            continue
+        model_id = value.get("slug")
+        if not isinstance(model_id, str) or not model_id:
+            _increment(skipped, "malformed_record")
+            continue
+        if model_id in seen:
+            raise CatalogError(f"chatgpt official catalog repeats model id {model_id}")
+        seen.add(model_id)
+        context = positive_int(value.get("context_window"))
+        maximum = positive_int(value.get("max_context_window"))
+        if context is None or maximum is None or context > maximum:
+            if model_id in reviewed:
+                raise CatalogError(
+                    f"reviewed ChatGPT route {model_id} has invalid official context metadata"
+                )
+            _increment(skipped, "malformed_record")
+            continue
+        observed_contexts[model_id] = context
+
+    models: list[dict[str, Any]] = []
+    matched: set[str] = set()
+    overridden_contexts = 0
+    for model_id, reviewed_model in reviewed.items():
+        model = dict(reviewed_model)
+        official_context = observed_contexts.get(model_id)
+        if official_context is not None:
+            overridden_contexts += int(model["context_window_tokens"] != official_context)
+            model["context_window_tokens"] = official_context
+            matched.add(model_id)
+        models.append(model)
+
+    reviewed_ids = set(reviewed)
+    allowed_unobserved = set(policy["filters"].get("allowed_unobserved_model_ids", []))
+    if not allowed_unobserved <= reviewed_ids:
+        raise CatalogError("chatgpt allowed unobserved ids must be reviewed routes")
+    unreviewed = len(set(observed_contexts) - reviewed_ids)
+    unavailable_ids = reviewed_ids - matched
+    unexpected_unavailable = unavailable_ids - allowed_unobserved
+    if unexpected_unavailable:
+        raise CatalogError(
+            "reviewed ChatGPT routes are absent from the official Codex catalog: "
+            + ", ".join(sorted(unexpected_unavailable))
+        )
+    unavailable = len(unavailable_ids)
+    if unreviewed:
+        skipped["not_curated_for_euler"] = unreviewed
+    warnings: list[str] = []
+    if overridden_contexts:
+        value_noun = "value" if overridden_contexts == 1 else "values"
+        warnings.append(
+            f"{overridden_contexts} reviewed ChatGPT context {value_noun} differed from the "
+            f"official snapshot; official {value_noun} won"
+        )
+    if unreviewed:
+        route_noun = "route" if unreviewed == 1 else "routes"
+        verb = "lacks" if unreviewed == 1 else "lack"
+        warnings.append(
+            f"{unreviewed} official ChatGPT {route_noun} {verb} reviewed Euler membership"
+        )
+    if unavailable:
+        route_noun = "route" if unavailable == 1 else "routes"
+        verb = "was" if unavailable == 1 else "were"
+        warnings.append(
+            f"{unavailable} reviewed ChatGPT {route_noun} {verb} absent from the "
+            "official Codex catalog; "
+            "reviewed fallback metadata was retained"
+        )
+    return _finish(
+        policy,
+        curated,
+        models,
+        observed_count=len(records),
+        curated_count=len(models),
+        skipped=skipped,
+        warnings=warnings,
+    )
+
+
 def _curated(
     policy: dict[str, Any], curated: dict[str, Any], payloads: dict[str, Any]
 ) -> NormalizationResult:
@@ -477,6 +570,7 @@ NORMALIZERS: dict[
     Callable[[dict[str, Any], dict[str, Any], dict[str, Any]], NormalizationResult],
 ] = {
     "anthropic": _anthropic,
+    "chatgpt": _chatgpt,
     "curated": _curated,
     "openai": _openai,
     "openrouter": _openrouter,

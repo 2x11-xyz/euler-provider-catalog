@@ -2,20 +2,29 @@
   "schema_version": 1,
   "provider_id": "chatgpt",
   "display_name": "ChatGPT",
-  "normalizer": "curated",
+  "normalizer": "chatgpt",
   "minimum_euler_version": "0.1.1",
   "discovery": {
-    "kind": "curated",
-    "endpoints": [],
+    "kind": "official_snapshot",
+    "endpoints": [
+      {
+        "id": "models",
+        "url": "https://raw.githubusercontent.com/openai/codex/main/codex-rs/models-manager/models.json",
+        "file": "models.json"
+      }
+    ],
     "documentation_urls": [
-      "https://developers.openai.com/codex/models"
+      "https://developers.openai.com/codex/models",
+      "https://github.com/openai/codex/blob/main/codex-rs/models-manager/models.json",
+      "https://github.com/openai/codex/blob/main/codex-rs/protocol/src/openai_models.rs",
+      "https://github.com/openai/codex/pull/33972"
     ]
   },
   "field_ownership": {
     "membership": "euler_curated_subscription_routes",
     "id": "euler_curated_subscription_routes",
     "display_name": "official_documentation_and_euler_curated",
-    "context_window_tokens": "euler_adapter_policy",
+    "context_window_tokens": "official_codex_catalog.models[].context_window for reviewed routes",
     "max_output_tokens": "euler_adapter_policy",
     "supports_tools": "euler_adapter_contract",
     "supports_reasoning": "euler_adapter_contract",
@@ -23,11 +32,14 @@
     "default_model": "euler_curated"
   },
   "filters": {
-    "membership_policy": "curated_only"
+    "membership_policy": "curated_only",
+    "allowed_unobserved_model_ids": [
+      "gpt-5.3-codex-spark"
+    ]
   },
   "limits": {
-    "max_response_bytes": 0,
-    "minimum_observed_models": 0,
+    "max_response_bytes": 2097152,
+    "minimum_observed_models": 5,
     "minimum_published_models": 1,
     "maximum_published_models": 100,
     "maximum_model_id_bytes": 256,

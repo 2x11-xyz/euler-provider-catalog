@@ -89,12 +89,16 @@ class PublicationTests(unittest.TestCase):
             self.assertEqual(diff["decision"], "no_change")
             self.assertNotEqual(NO_CHANGE_EXIT, 2)
 
-    def test_pending_release_order_never_regresses_the_bot_branch(self) -> None:
+    def test_release_order_tracks_canonical_timestamps_in_both_directions(self) -> None:
         stable = load_release(ROOT / "stable", stable=True)
-        older = load_release(ROOT / "fixtures" / "expected")
+        candidate = load_release(ROOT / "fixtures" / "expected")
         self.assertEqual(compare_releases(stable, stable), "same")
-        self.assertEqual(compare_releases(stable, older), "newer")
-        self.assertEqual(compare_releases(older, stable), "stale")
+        older, newer = sorted(
+            (stable, candidate), key=lambda release: release.manifest["generated_at"]
+        )
+        self.assertNotEqual(older.manifest["generated_at"], newer.manifest["generated_at"])
+        self.assertEqual(compare_releases(older, newer), "stale")
+        self.assertEqual(compare_releases(newer, older), "newer")
 
     def test_blocked_candidate_cannot_be_prepared_as_stable(self) -> None:
         with self.assertRaisesRegex(CatalogError, "blocked candidate"):

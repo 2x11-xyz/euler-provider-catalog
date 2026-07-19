@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-18T00:00:00Z",
+  "generated_at": "2026-07-19T00:00:00Z",
   "generator": {
     "name": "euler-provider-catalog",
     "version": "0.1.0"
@@ -44,30 +44,43 @@
     },
     "chatgpt": {
       "curated_model_count": 7,
-      "discovery_kind": "curated",
+      "discovery_kind": "official_snapshot",
       "documentation_urls": [
-        "https://developers.openai.com/codex/models"
+        "https://developers.openai.com/codex/models",
+        "https://github.com/openai/codex/blob/main/codex-rs/models-manager/models.json",
+        "https://github.com/openai/codex/blob/main/codex-rs/protocol/src/openai_models.rs",
+        "https://github.com/openai/codex/pull/33972"
       ],
       "inputs": [
         {
           "bytes": 2826,
           "kind": "curated",
           "path": "curated/chatgpt.json",
-          "sha256": "8c64cb9f75f48fccd6276619665627d3678c1e62957546bc991fedaad4578b18"
+          "sha256": "f21b265c45706a4ab2ec2013761b2e50227ef3648d2a304b32d48ab068922d78"
         },
         {
-          "bytes": 1105,
+          "bytes": 893,
+          "kind": "official_snapshot",
+          "path": "observations/chatgpt/models.json",
+          "sha256": "8b35a263f13842d9a6ecb8b26b224b4714beefe0c6526a8964c6fe54a72c9c7d",
+          "source_url": "https://raw.githubusercontent.com/openai/codex/main/codex-rs/models-manager/models.json"
+        },
+        {
+          "bytes": 1650,
           "kind": "source_policy",
           "path": "sources/chatgpt.json",
-          "sha256": "f626ef0497ae382f3d238c4c78f67a916ee1a6f296a37040afbe5377bdc002ef"
+          "sha256": "a2a33586cd9ecc7392e1cb8dfeb4c9b4b1c77feaf669ddd53bb3d4903fc4da87"
         }
       ],
-      "observed_at": "2026-07-18T00:00:00Z",
-      "observed_model_count": 0,
+      "observed_at": "2026-07-19T00:00:00Z",
+      "observed_model_count": 8,
       "published_model_count": 7,
-      "skipped": {},
+      "skipped": {
+        "not_curated_for_euler": 2
+      },
       "warnings": [
-        "no suitable unattended public discovery API; route membership is reviewed"
+        "1 reviewed ChatGPT route was absent from the official Codex catalog; reviewed fallback metadata was retained",
+        "2 official ChatGPT routes lack reviewed Euler membership"
       ]
     },
     "openai": {

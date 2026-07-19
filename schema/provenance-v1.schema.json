@@ -61,6 +61,7 @@
         "discovery_kind": {
           "enum": [
             "official_api",
+            "official_snapshot",
             "curated",
             "bootstrap"
           ]
@@ -120,6 +121,35 @@
     "input": {
       "type": "object",
       "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "official_api",
+                  "official_snapshot"
+                ]
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "source_url"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "source_url"
+              ]
+            }
+          }
+        }
+      ],
       "required": [
         "kind",
         "path",
@@ -130,6 +160,7 @@
         "kind": {
           "enum": [
             "official_api",
+            "official_snapshot",
             "bootstrap",
             "curated",
             "source_policy"

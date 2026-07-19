@@ -197,11 +197,123 @@ class PipelineTests(unittest.TestCase):
             provenance = artifacts["provenance-v1.json"]["providers"]["xai"]
             self.assertEqual(provenance["skipped"]["alias_collides_with_primary_id"], 1)
 
-    def test_chatgpt_is_explicitly_curated(self) -> None:
-        provenance = generate().documents["provenance-v1.json"]["providers"]["chatgpt"]
-        self.assertEqual(provenance["discovery_kind"], "curated")
-        self.assertEqual(provenance["observed_model_count"], 0)
+    def test_chatgpt_membership_is_curated_and_context_is_officially_observed(self) -> None:
+        artifacts = generate().documents
+        models = {
+            model["id"]: model
+            for model in artifacts["catalog-v1.json"]["providers"]["chatgpt"]["models"]
+        }
+        for model_id in ("gpt-5.6-luna", "gpt-5.6-sol", "gpt-5.6-terra"):
+            self.assertEqual(models[model_id]["context_window_tokens"], 272000)
+        self.assertEqual(models["gpt-5.3-codex-spark"]["context_window_tokens"], 128000)
+        self.assertNotIn("gpt-5.2", models)
+        provenance = artifacts["provenance-v1.json"]["providers"]["chatgpt"]
+        self.assertEqual(provenance["discovery_kind"], "official_snapshot")
+        self.assertEqual(provenance["observed_model_count"], 8)
         self.assertEqual(provenance["published_model_count"], 7)
+        self.assertEqual(provenance["skipped"]["not_curated_for_euler"], 2)
+        self.assertTrue(any("1 reviewed ChatGPT route" in item for item in provenance["warnings"]))
+
+    def test_chatgpt_official_context_overrides_reviewed_fallback(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            fixtures = Path(temporary) / "fixtures"
+            curated = Path(temporary) / "curated"
+            shutil.copytree(ROOT / "fixtures", fixtures)
+            shutil.copytree(ROOT / "curated", curated)
+            curated_path = curated / "chatgpt.json"
+            reviewed = json.loads(curated_path.read_bytes())
+            target = next(model for model in reviewed["models"] if model["id"] == "gpt-5.6-sol")
+            target["context_window_tokens"] = 999999
+            curated_path.write_bytes(canonical_json_bytes(reviewed))
+
+            artifacts = generate(fixtures=fixtures, curated=curated).documents
+            models = {
+                model["id"]: model
+                for model in artifacts["catalog-v1.json"]["providers"]["chatgpt"]["models"]
+            }
+            self.assertEqual(models["gpt-5.6-sol"]["context_window_tokens"], 272000)
+            warnings = artifacts["provenance-v1.json"]["providers"]["chatgpt"]["warnings"]
+            self.assertTrue(any("1 reviewed ChatGPT context value" in item for item in warnings))
+
+    def test_chatgpt_invalid_context_for_reviewed_route_fails_closed(self) -> None:
+        for context, maximum in ((0, 272000), (300000, 272000)):
+            with self.subTest(context=context), tempfile.TemporaryDirectory() as temporary:
+                fixtures = Path(temporary) / "fixtures"
+                shutil.copytree(ROOT / "fixtures", fixtures)
+                path = fixtures / "chatgpt" / "models.json"
+                payload = json.loads(path.read_bytes())
+                target = next(
+                    model for model in payload["models"] if model["slug"] == "gpt-5.6-sol"
+                )
+                target["context_window"] = context
+                target["max_context_window"] = maximum
+                path.write_bytes(canonical_json_bytes(payload))
+                refresh_sidecar(fixtures, "chatgpt")
+                with self.assertRaisesRegex(CatalogError, "invalid official context metadata"):
+                    generate(fixtures)
+
+    def test_chatgpt_allowed_unobserved_ids_must_be_reviewed(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            sources = Path(temporary) / "sources"
+            shutil.copytree(ROOT / "sources", sources)
+            path = sources / "chatgpt.json"
+            policy = json.loads(path.read_bytes())
+            policy["filters"]["allowed_unobserved_model_ids"].append("not-reviewed")
+            path.write_bytes(canonical_json_bytes(policy))
+            with self.assertRaisesRegex(CatalogError, "must be reviewed routes"):
+                generate(sources=sources)
+
+    def test_chatgpt_malformed_record_is_counted_without_becoming_membership(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            fixtures = Path(temporary) / "fixtures"
+            shutil.copytree(ROOT / "fixtures", fixtures)
+            path = fixtures / "chatgpt" / "models.json"
+            payload = json.loads(path.read_bytes())
+            payload["models"].append(None)
+            path.write_bytes(canonical_json_bytes(payload))
+            refresh_sidecar(fixtures, "chatgpt")
+            provenance = generate(fixtures).documents["provenance-v1.json"]["providers"]["chatgpt"]
+            self.assertEqual(provenance["observed_model_count"], 9)
+            self.assertEqual(provenance["skipped"]["malformed_record"], 1)
+
+    def test_chatgpt_unexpected_missing_reviewed_route_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            fixtures = Path(temporary) / "fixtures"
+            shutil.copytree(ROOT / "fixtures", fixtures)
+            path = fixtures / "chatgpt" / "models.json"
+            payload = json.loads(path.read_bytes())
+            payload["models"] = [
+                model for model in payload["models"] if model["slug"] != "gpt-5.6-sol"
+            ]
+            path.write_bytes(canonical_json_bytes(payload))
+            refresh_sidecar(fixtures, "chatgpt")
+            with self.assertRaisesRegex(CatalogError, "gpt-5.6-sol"):
+                generate(fixtures)
+
+    def test_chatgpt_duplicate_slug_fails_before_filtering(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            fixtures = Path(temporary) / "fixtures"
+            shutil.copytree(ROOT / "fixtures", fixtures)
+            path = fixtures / "chatgpt" / "models.json"
+            payload = json.loads(path.read_bytes())
+            payload["models"].extend(
+                [
+                    {
+                        "slug": "future-duplicate",
+                        "context_window": 0,
+                        "max_context_window": 272000,
+                    },
+                    {
+                        "slug": "future-duplicate",
+                        "context_window": 272000,
+                        "max_context_window": 272000,
+                    },
+                ]
+            )
+            path.write_bytes(canonical_json_bytes(payload))
+            refresh_sidecar(fixtures, "chatgpt")
+            with self.assertRaisesRegex(CatalogError, "repeats model id future-duplicate"):
+                generate(fixtures)
 
     def test_anthropic_reasoning_matches_the_adaptive_effort_adapter(self) -> None:
         models = {
@@ -314,6 +426,19 @@ class PipelineTests(unittest.TestCase):
                 with self.assertRaises(CatalogError):
                     load_policy(sources, "openrouter")
 
+    def test_official_snapshot_discovery_is_chatgpt_only(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            sources = Path(temporary) / "sources"
+            shutil.copytree(ROOT / "sources", sources)
+            path = sources / "anthropic.json"
+            policy = json.loads(path.read_bytes())
+            policy["normalizer"] = "chatgpt"
+            policy["discovery"]["kind"] = "official_snapshot"
+            policy["filters"] = {"allowed_unobserved_model_ids": []}
+            path.write_bytes(canonical_json_bytes(policy))
+            with self.assertRaisesRegex(CatalogError, "reserved for the chatgpt provider"):
+                load_policy(sources, "anthropic")
+
     def test_record_all_continues_after_one_provider_fails(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             fixtures = Path(temporary) / "fixtures"
@@ -333,7 +458,7 @@ class PipelineTests(unittest.TestCase):
             ]
             with patch("sys.argv", arguments), patch("builtins.print"):
                 self.assertEqual(record_observations(), 1)
-            for provider_id in ("openai", "openrouter", "xai"):
+            for provider_id in ("chatgpt", "openai", "openrouter", "xai"):
                 sidecar = json.loads((fixtures / provider_id / "observation.json").read_bytes())
                 self.assertEqual(sidecar["observed_at"], observed_at)
 

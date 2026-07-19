@@ -6,7 +6,7 @@ from pathlib import Path
 
 import jsonschema
 
-from catalog_pipeline.common import MODEL_METADATA_FIELDS
+from catalog_pipeline.common import MODEL_METADATA_FIELDS, OBSERVED_DISCOVERY_KINDS
 from catalog_pipeline.promotion import classify_promotion, load_promotion_policy
 from catalog_pipeline.promotion_contract import DECISIONS, PROVIDER_FIELDS, REASONS, STATUSES
 from catalog_pipeline.release import load_release
@@ -40,7 +40,7 @@ class SchemaTests(unittest.TestCase):
 
     def test_observation_sidecars_conform_to_their_schema(self) -> None:
         validator = self._validator("observation-v1.schema.json")
-        for provider_id in ("anthropic", "openai", "openrouter", "xai"):
+        for provider_id in ("anthropic", "chatgpt", "openai", "openrouter", "xai"):
             with self.subTest(provider=provider_id):
                 document = json.loads(
                     (ROOT / "fixtures" / provider_id / "observation.json").read_bytes()
@@ -71,6 +71,18 @@ class SchemaTests(unittest.TestCase):
         self.assertEqual(set(schema["properties"]["reasons"]["items"]["enum"]), REASONS)
         self.assertEqual(set(provider["provider_fields_changed"]["items"]["enum"]), PROVIDER_FIELDS)
         self.assertEqual(set(schema["$defs"]["status"]["enum"]), STATUSES)
+
+    def test_provenance_discovery_enums_match_the_runtime_contract(self) -> None:
+        schema = json.loads((ROOT / "schema" / "provenance-v1.schema.json").read_bytes())
+        provider_kinds = schema["$defs"]["provider_provenance"]["properties"]["discovery_kind"][
+            "enum"
+        ]
+        input_kinds = schema["$defs"]["input"]["properties"]["kind"]["enum"]
+        self.assertEqual(set(provider_kinds), OBSERVED_DISCOVERY_KINDS | {"curated", "bootstrap"})
+        self.assertEqual(
+            set(input_kinds),
+            OBSERVED_DISCOVERY_KINDS | {"bootstrap", "curated", "source_policy"},
+        )
 
 
 if __name__ == "__main__":

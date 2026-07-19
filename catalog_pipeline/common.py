@@ -26,6 +26,7 @@ MODEL_METADATA_FIELDS = tuple(
 PROVIDER_ID_PATTERN = re.compile(r"^[a-z][a-z0-9-]{0,63}$")
 RELEASE_ID_PATTERN = re.compile(r"^catalog-v1-[0-9]{8}t[0-9]{6}z-[a-f0-9]{64}$")
 VERSION_PATTERN = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+$")
+OBSERVED_DISCOVERY_KINDS = frozenset({"official_api", "official_snapshot"})
 
 
 class CatalogError(ValueError):
