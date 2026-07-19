@@ -177,6 +177,20 @@ class PipelineTests(unittest.TestCase):
                 with self.assertRaisesRegex(CatalogError, message):
                     generate(fixtures)
 
+    def test_malformed_optional_router_rates_cannot_disappear_from_a_schedule(self) -> None:
+        for field in ("input_cache_read", "input_cache_write"):
+            with self.subTest(field=field), tempfile.TemporaryDirectory() as temporary:
+                fixtures = Path(temporary) / "fixtures"
+                shutil.copytree(ROOT / "fixtures", fixtures)
+                path = fixtures / "openrouter" / "models.json"
+                payload = json.loads(path.read_bytes())
+                payload["data"][0]["pricing"][field] = "0.0000001234567"
+                path.write_bytes(canonical_json_bytes(payload))
+                refresh_sidecar(fixtures, "openrouter")
+
+                with self.assertRaisesRegex(CatalogError, "more precision"):
+                    generate(fixtures)
+
     def test_curated_router_routes_are_fallbacks_when_api_starts_listing_them(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             fixtures = Path(temporary) / "fixtures"
