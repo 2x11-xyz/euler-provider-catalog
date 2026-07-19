@@ -40,6 +40,17 @@ The repository layout keeps those decisions visible:
 - `fixtures/expected/` is the byte-for-byte expected centralized output for
   the checked-in fixtures. It is test data, never a release source.
 
+Optional token-price schedules follow the same ownership rules. OpenRouter
+rates come from each official Models API record. Providers whose list APIs do
+not publish prices use the reviewed `pricing` map in their curated input,
+backed by the official pricing documentation named by the source policy.
+Published rates are exact USD-per-million-token decimals; missing rates remain
+absent instead of being inferred as zero. A price-bearing catalog requires an
+Euler version that understands the added strict model field. Such a candidate
+must not be promoted into `stable/` until that minimum Euler version has been
+released; generated fixtures exercise the future protocol but are never a
+publication source.
+
 Generate the checked-in fixture artifacts:
 
 ```console

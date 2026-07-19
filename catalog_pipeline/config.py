@@ -11,6 +11,7 @@ from .common import (
     require_array,
     require_object,
     require_string,
+    validate_cost,
     validate_model,
     validate_model_id,
     validate_timestamp,
@@ -154,6 +155,7 @@ def load_curated(
         "aliases",
         "models",
         "additions",
+        "pricing",
     }
     if set(curated) != expected_fields:
         raise CatalogError(f"curated/{provider_id}.json has an invalid shape")
@@ -184,7 +186,22 @@ def load_curated(
         ids = [model["id"] for model in validated]
         if len(ids) != len(set(ids)):
             raise CatalogError(f"{provider_id}.{collection} contains duplicate model ids")
+        if any("cost" in model for model in validated):
+            raise CatalogError(f"{provider_id}.{collection} pricing belongs in the pricing map")
         curated[collection] = validated
+    pricing = require_object(curated["pricing"], f"{provider_id}.pricing")
+    validated_pricing = {}
+    for model_id, cost in pricing.items():
+        model_id = validate_model_id(
+            model_id,
+            maximum_model_id_bytes,
+            f"{provider_id}.pricing model id",
+        )
+        validated_pricing[model_id] = validate_cost(
+            cost,
+            f"{provider_id}.pricing[{model_id}]",
+        )
+    curated["pricing"] = validated_pricing
     overlap = {model["id"] for model in curated["models"]} & {
         model["id"] for model in curated["additions"]
     }

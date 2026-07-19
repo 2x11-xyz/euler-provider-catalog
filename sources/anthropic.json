@@ -3,7 +3,7 @@
   "provider_id": "anthropic",
   "display_name": "Anthropic",
   "normalizer": "anthropic",
-  "minimum_euler_version": "0.1.1",
+  "minimum_euler_version": "0.1.2",
   "discovery": {
     "kind": "official_api",
     "endpoints": [
@@ -16,6 +16,7 @@
     "documentation_urls": [
       "https://platform.claude.com/docs/en/api/models/list",
       "https://platform.claude.com/docs/en/about-claude/models/overview",
+      "https://platform.claude.com/docs/en/about-claude/pricing",
       "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview"
     ]
   },
@@ -28,7 +29,8 @@
     "supports_tools": "official_tool_use_contract",
     "supports_reasoning": "official_api.data[].capabilities.thinking.types.adaptive and capabilities.effort",
     "reasoning_efforts": "official_api.data[].capabilities.effort constrained by the Euler adaptive-thinking adapter",
-    "default_model": "euler_curated"
+    "default_model": "euler_curated",
+    "cost": "official_pricing_documentation recorded in euler_curated pricing metadata"
   },
   "filters": {
     "required_object_type": "model"

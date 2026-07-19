@@ -3,12 +3,13 @@
   "provider_id": "chatgpt",
   "display_name": "ChatGPT",
   "normalizer": "curated",
-  "minimum_euler_version": "0.1.1",
+  "minimum_euler_version": "0.1.2",
   "discovery": {
     "kind": "curated",
     "endpoints": [],
     "documentation_urls": [
-      "https://developers.openai.com/codex/models"
+      "https://developers.openai.com/codex/models",
+      "https://developers.openai.com/api/docs/pricing"
     ]
   },
   "field_ownership": {
@@ -20,7 +21,8 @@
     "supports_tools": "euler_adapter_contract",
     "supports_reasoning": "euler_adapter_contract",
     "reasoning_efforts": "euler_adapter_contract",
-    "default_model": "euler_curated"
+    "default_model": "euler_curated",
+    "cost": "reviewed equivalent public API schedule from official_pricing_documentation"
   },
   "filters": {
     "membership_policy": "curated_only"

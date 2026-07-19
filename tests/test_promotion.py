@@ -190,7 +190,10 @@ class PromotionTests(unittest.TestCase):
         diff = classify_promotion(self.release, candidate, self.policy)
         self.assertEqual(diff["decision"], "review_required")
         self.assertEqual(diff["reasons"], ["minimum_euler_version_changed"])
-        self.assertEqual(diff["from_minimum_euler_version"], "0.1.1")
+        self.assertEqual(
+            diff["from_minimum_euler_version"],
+            self.release.manifest["minimum_euler_version"],
+        )
         self.assertEqual(diff["to_minimum_euler_version"], "0.2.0")
 
     def test_non_monotonic_changed_release_is_blocked(self) -> None:

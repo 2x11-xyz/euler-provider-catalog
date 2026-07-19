@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
+from decimal import Decimal, InvalidOperation, localcontext
 from typing import Any, Callable
 
 from .common import (
@@ -10,6 +12,7 @@ from .common import (
     positive_int,
     require_array,
     require_object,
+    validate_cost,
     validate_model,
 )
 
@@ -35,6 +38,65 @@ def _canonical_efforts(values: list[str]) -> list[str]:
 def _require_provider_owned(value: dict[str, Any], policy: dict[str, Any], scope: str) -> None:
     if not is_provider_owned_record(value, policy["filters"]):
         raise CatalogError(f"{scope} is not a public provider-owned model record")
+
+
+def _json_price_number(value: Decimal, scope: str) -> int | float:
+    if value == value.to_integral():
+        return int(value)
+    number = float(value)
+    if Decimal(str(number)) != value:
+        raise CatalogError(f"{scope} cannot be represented canonically")
+    return number
+
+
+def _openrouter_rate(value: Any, scope: str) -> int | float | None:
+    if value is None:
+        return None
+    if (
+        not isinstance(value, str)
+        or len(value) > 64
+        or re.fullmatch(r"-?[0-9]+(?:\.[0-9]+)?", value) is None
+    ):
+        raise CatalogError(f"{scope} must be a decimal string")
+    try:
+        per_token = Decimal(value)
+    except InvalidOperation as error:
+        raise CatalogError(f"{scope} must be a decimal string") from error
+    if not per_token.is_finite():
+        raise CatalogError(f"{scope} must be finite")
+    if per_token < 0:
+        return None
+    with localcontext() as context:
+        context.prec = 80
+        per_million = per_token * Decimal(1_000_000)
+        rounded = per_million.quantize(Decimal("0.000001"))
+    if per_million > Decimal(1_000_000):
+        raise CatalogError(f"{scope} is out of bounds")
+    if per_million != rounded:
+        raise CatalogError(f"{scope} has more precision than Euler can publish")
+    return _json_price_number(per_million, scope)
+
+
+def _openrouter_cost(value: Any, scope: str) -> dict[str, Any] | None:
+    if value is None:
+        return None
+    pricing = require_object(value, scope)
+    input_rate = _openrouter_rate(pricing.get("prompt"), f"{scope}.prompt")
+    output_rate = _openrouter_rate(pricing.get("completion"), f"{scope}.completion")
+    if input_rate is None or output_rate is None:
+        return None
+    cost: dict[str, Any] = {"input": input_rate, "output": output_rate}
+    for upstream, field in (
+        ("input_cache_read", "cache_read"),
+        ("input_cache_write", "cache_write_5m"),
+    ):
+        if upstream not in pricing:
+            continue
+        rate = _openrouter_rate(pricing[upstream], f"{scope}.{upstream}")
+        if rate is None:
+            return None
+        cost[field] = rate
+    return validate_cost(cost, scope)
 
 
 def _finish(
@@ -79,6 +141,25 @@ def _finish(
             f"{curated_conflicts} curated fallback records disagreed with official fields; "
             "official values won"
         )
+    pricing_conflicts = 0
+    matched_prices: set[str] = set()
+    for model in models:
+        fallback = curated["pricing"].get(model["id"])
+        if fallback is None:
+            continue
+        matched_prices.add(model["id"])
+        if "cost" not in model:
+            model["cost"] = fallback
+        elif model["cost"] != fallback:
+            pricing_conflicts += 1
+    if pricing_conflicts:
+        warnings.append(
+            f"{pricing_conflicts} curated price records disagreed with official prices; "
+            "official values won"
+        )
+    unmatched_prices = len(set(curated["pricing"]) - matched_prices)
+    if unmatched_prices:
+        warnings.append(f"{unmatched_prices} curated price records had no published model")
     validated = [
         validate_model(model, limits, f"{provider_id}.models[{index}]")
         for index, model in enumerate(models)
@@ -180,6 +261,9 @@ def _openrouter(
         )
         if output is not None:
             model["max_output_tokens"] = output
+        cost = _openrouter_cost(value.get("pricing"), f"openrouter.models[{model_id}].pricing")
+        if cost is not None:
+            model["cost"] = cost
         models.append(model)
 
     return _finish(

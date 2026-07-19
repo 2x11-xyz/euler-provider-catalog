@@ -147,5 +147,106 @@
       ]
     }
   ],
-  "additions": []
+  "additions": [],
+  "pricing": {
+    "gpt-4.1-mini": {
+      "input": 0.4,
+      "output": 1.6,
+      "cache_read": 0.1,
+      "cache_write_5m": 0
+    },
+    "gpt-5": {
+      "input": 1.25,
+      "output": 10,
+      "cache_read": 0.125,
+      "cache_write_5m": 0
+    },
+    "gpt-5.4": {
+      "input": 2.5,
+      "output": 15,
+      "cache_read": 0.25,
+      "cache_write_5m": 0,
+      "tiers": [
+        {
+          "input_tokens_above": 272000,
+          "input": 5,
+          "output": 22.5,
+          "cache_read": 0.5,
+          "cache_write_5m": 0
+        }
+      ]
+    },
+    "gpt-5.4-mini": {
+      "input": 0.75,
+      "output": 4.5,
+      "cache_read": 0.075,
+      "cache_write_5m": 0
+    },
+    "gpt-5.4-nano": {
+      "input": 0.2,
+      "output": 1.25,
+      "cache_read": 0.02,
+      "cache_write_5m": 0
+    },
+    "gpt-5.5": {
+      "input": 5,
+      "output": 30,
+      "cache_read": 0.5,
+      "cache_write_5m": 0,
+      "tiers": [
+        {
+          "input_tokens_above": 272000,
+          "input": 10,
+          "output": 45,
+          "cache_read": 1,
+          "cache_write_5m": 0
+        }
+      ]
+    },
+    "gpt-5.6-luna": {
+      "input": 1,
+      "output": 6,
+      "cache_read": 0.1,
+      "cache_write_5m": 1.25,
+      "tiers": [
+        {
+          "input_tokens_above": 272000,
+          "input": 2,
+          "output": 9,
+          "cache_read": 0.2,
+          "cache_write_5m": 2.5
+        }
+      ]
+    },
+    "gpt-5.6-sol": {
+      "input": 5,
+      "output": 30,
+      "cache_read": 0.5,
+      "cache_write_5m": 6.25,
+      "tiers": [
+        {
+          "input_tokens_above": 272000,
+          "input": 10,
+          "output": 45,
+          "cache_read": 1,
+          "cache_write_5m": 12.5
+        }
+      ]
+    },
+    "gpt-5.6-terra": {
+      "input": 2.5,
+      "output": 15,
+      "cache_read": 0.25,
+      "cache_write_5m": 3.125,
+      "tiers": [
+        {
+          "input_tokens_above": 272000,
+          "input": 5,
+          "output": 22.5,
+          "cache_read": 0.5,
+          "cache_write_5m": 6.25
+        }
+      ]
+    }
+  }
 }
