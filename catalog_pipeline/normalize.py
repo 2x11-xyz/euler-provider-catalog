@@ -43,7 +43,7 @@ def _finish(
     models: list[dict[str, Any]],
     *,
     observed_count: int,
-    curated_count: int,
+    curated_ids: set[str],
     skipped: dict[str, int],
     warnings: list[str],
 ) -> NormalizationResult:
@@ -65,15 +65,19 @@ def _finish(
         if observed is None:
             models.append(addition)
             by_id[addition["id"]] = addition
+            curated_ids.add(addition["id"])
             continue
         conflict = False
+        contributed = False
         for field, value in addition.items():
             if field not in observed:
                 observed[field] = value
+                contributed = True
             elif observed[field] != value:
                 conflict = True
+        if contributed:
+            curated_ids.add(addition["id"])
         curated_conflicts += int(conflict)
-    curated_count += len(curated["additions"])
     if curated_conflicts:
         warnings.append(
             f"{curated_conflicts} curated fallback records disagreed with official fields; "
@@ -94,7 +98,7 @@ def _finish(
     return NormalizationResult(
         models=validated,
         observed_model_count=observed_count,
-        curated_model_count=curated_count,
+        curated_model_count=len(curated_ids),
         skipped=dict(sorted(skipped.items())),
         warnings=sorted(set(warnings)),
     )
@@ -187,7 +191,7 @@ def _openrouter(
         curated,
         models,
         observed_count=len(records),
-        curated_count=0,
+        curated_ids=set(),
         skipped=skipped,
         warnings=warnings,
     )
@@ -272,7 +276,7 @@ def _anthropic(
         curated,
         models,
         observed_count=len(records),
-        curated_count=0,
+        curated_ids=set(),
         skipped=skipped,
         warnings=[],
     )
@@ -325,7 +329,7 @@ def _openai(
         curated,
         [reviewed[model_id] for model_id in admitted_ids],
         observed_count=len(records),
-        curated_count=len(admitted_ids),
+        curated_ids=set(admitted_ids),
         skipped=skipped,
         warnings=warnings,
     )
@@ -359,8 +363,12 @@ def _xai(
                 if isinstance(alias, str) and alias:
                     contexts.setdefault(alias, context)
 
-    reviewed = {model["id"]: model for model in curated["models"]}
+    reviewed_models = {model["id"]: model for model in curated["models"]}
+    reviewed_additions = {model["id"]: model for model in curated["additions"]}
+    # load_curated rejects overlap before this provider-specific union.
+    reviewed = reviewed_models | reviewed_additions
     used_reviewed: set[str] = set()
+    curated_ids: set[str] = set()
     required_modalities = set(policy["filters"]["required_output_modalities"])
     skipped: dict[str, int] = {}
     records: list[dict[str, Any]] = []
@@ -398,6 +406,7 @@ def _xai(
         if reviewed_model is not None:
             model = dict(reviewed_model)
             used_reviewed.add(reviewed_model["id"])
+            curated_ids.add(model_id)
             if inherited_alias:
                 model["id"] = model_id
                 model["display_name"] = f"{reviewed_model['display_name']} ({model_id})"
@@ -450,7 +459,7 @@ def _xai(
         curated,
         list(models_by_id.values()),
         observed_count=len(language_models),
-        curated_count=len(used_reviewed),
+        curated_ids=curated_ids,
         skipped=skipped,
         warnings=warnings,
     )
@@ -543,7 +552,7 @@ def _chatgpt(
         curated,
         models,
         observed_count=len(records),
-        curated_count=len(models),
+        curated_ids=set(reviewed),
         skipped=skipped,
         warnings=warnings,
     )
@@ -559,7 +568,7 @@ def _curated(
         curated,
         list(curated["models"]),
         observed_count=0,
-        curated_count=len(curated["models"]),
+        curated_ids={model["id"] for model in curated["models"]},
         skipped={},
         warnings=["no suitable unattended public discovery API; route membership is reviewed"],
     )

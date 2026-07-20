@@ -40,6 +40,25 @@ The repository layout keeps those decisions visible:
 - `fixtures/expected/` is the byte-for-byte expected centralized output for
   the checked-in fixtures. It is test data, never a release source.
 
+## Authority and route semantics
+
+The bootstrap is a historical seed, not a continuing upstream. After the first
+stable release, the authority chain is one-way: official provider evidence and
+reviewed curation produce `stable/`; `stable/` produces an immutable GitHub
+Release; and Euler consumes those exact release bytes. Syncing a release into
+Euler never makes Euler an input to a later catalog release.
+
+A catalog model ID is a provider-callable route string. Official aliases are
+therefore intentionally represented as selectable model entries, even when an
+upstream list endpoint returns only the canonical snapshot. A curated addition
+may retain a route documented by the provider but omitted from its structured
+list; it remains governed by the curated-input digest and human-reviewed
+promotion diff. `deprecated` identifies a retained compatibility or redirect
+route and does not claim that the upstream still serves the original model.
+For OpenAI, reviewed metadata alone never creates membership: publication is
+always the intersection of reviewed records and the current provider-owned API
+observation.
+
 Generate the checked-in fixture artifacts:
 
 ```console

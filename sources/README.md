@@ -55,6 +55,16 @@ Human-readable pages back structured review but are never scraped to mutate a
 stable catalog. An unknown or incomplete structured record is skipped with
 provenance, not filled by an undocumented guess.
 
+Provider-callable aliases are membership, not display-only labels. Anthropic's
+list endpoint currently returns canonical snapshots while its official model-ID
+documentation also defines short Claude API aliases; those reviewed aliases
+are explicit curated additions. xAI's language-model response supplies both
+canonical IDs and aliases directly. Officially retired xAI slugs that still
+redirect may remain explicit `deprecated` additions until a later reviewed
+removal. For OpenAI, carrying reviewed metadata forward from the last stable
+catalog never bypasses current API membership: an unobserved ID is not
+published.
+
 Because this is a public repository, upstream responses are projected before
 they are written when they may contain private or non-metadata fields. For
 OpenAI and xAI, only records owned by the provider are retained; private

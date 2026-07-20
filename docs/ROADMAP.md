@@ -36,6 +36,18 @@ threshold in `promotion-policy.json` is 1,000 basis points (10%); the
 calculation rounds upward so a change is never understated. Every removal at
 or below that threshold still requires human review.
 
+Shrink is provider-local and identity-based: removed IDs are divided by that
+provider's prior published count. Net growth does not hide removed-ID churn,
+and active and deprecated route IDs remain in the denominator until a reviewed
+release actually removes them.
+
+The first live promotion reconciles the reviewed Euler bootstrap with provider
+list semantics. That reconciliation may carry reviewed metadata forward only
+when current official observation still admits the route, or retain an
+officially documented alias or redirect as an explicit curated addition. It
+must not relax the shrink policy. Once a live release is published, `bootstrap/`
+remains reproducibility history and `stable/` is the sole catalog authority.
+
 ### Repository prerequisites
 
 1. Protect `main` and require the catalog CI check.

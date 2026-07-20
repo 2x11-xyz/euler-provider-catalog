@@ -1,10 +1,51 @@
 {
   "schema_version": 1,
   "provider_id": "anthropic",
-  "reviewed_at": "2026-07-18T00:00:00Z",
+  "reviewed_at": "2026-07-20T00:00:00Z",
   "membership_policy": "all_observed",
   "default_model": "claude-sonnet-5",
   "aliases": [],
   "models": [],
-  "additions": []
+  "additions": [
+    {
+      "id": "claude-haiku-4-5",
+      "display_name": "Claude Haiku 4.5",
+      "status": "active",
+      "context_window_tokens": 200000,
+      "max_output_tokens": 64000,
+      "supports_tools": true,
+      "supports_reasoning": false,
+      "reasoning_efforts": []
+    },
+    {
+      "id": "claude-opus-4-1",
+      "display_name": "Claude Opus 4.1",
+      "status": "active",
+      "context_window_tokens": 200000,
+      "max_output_tokens": 32000,
+      "supports_tools": true,
+      "supports_reasoning": false,
+      "reasoning_efforts": []
+    },
+    {
+      "id": "claude-opus-4-5",
+      "display_name": "Claude Opus 4.5",
+      "status": "active",
+      "context_window_tokens": 200000,
+      "max_output_tokens": 64000,
+      "supports_tools": true,
+      "supports_reasoning": false,
+      "reasoning_efforts": []
+    },
+    {
+      "id": "claude-sonnet-4-5",
+      "display_name": "Claude Sonnet 4.5",
+      "status": "active",
+      "context_window_tokens": 1000000,
+      "max_output_tokens": 64000,
+      "supports_tools": true,
+      "supports_reasoning": false,
+      "reasoning_efforts": []
+    }
+  ]
 }

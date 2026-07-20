@@ -161,7 +161,30 @@ class PromotionTests(unittest.TestCase):
         diff = classify_promotion(self.release, candidate, self.policy)
         self.assertEqual(diff["decision"], "blocked")
         self.assertIn("excessive_shrink", diff["reasons"])
-        self.assertEqual(diff["providers"]["anthropic"]["shrink_basis_points"], 3334)
+        self.assertEqual(diff["providers"]["anthropic"]["shrink_basis_points"], 1667)
+
+    def test_net_growth_does_not_mask_excessive_removed_id_churn(self) -> None:
+        removed = {"grok-3", "grok-3-fast"}
+
+        def replace_models(catalog: dict[str, Any]) -> None:
+            provider = catalog["providers"]["xai"]
+            template = copy.deepcopy(provider["models"][0])
+            provider["models"] = [
+                model for model in provider["models"] if model["id"] not in removed
+            ]
+            for index in range(20):
+                model = copy.deepcopy(template)
+                model["id"] = f"example-growth-{index:02d}"
+                provider["models"].append(model)
+            provider["models"].sort(key=lambda item: item["id"])
+
+        candidate = changed_release(self.release, catalog_change=replace_models)
+        diff = classify_promotion(self.release, candidate, self.policy)
+        provider = diff["providers"]["xai"]
+        self.assertGreater(provider["after_model_count"], provider["before_model_count"])
+        self.assertEqual(set(provider["models_removed"]), removed)
+        self.assertGreater(provider["shrink_basis_points"], 1000)
+        self.assertEqual(diff["decision"], "blocked")
 
     def test_governed_input_change_prevents_addition_only_classification(self) -> None:
         def add_model(catalog: dict[str, Any]) -> None:

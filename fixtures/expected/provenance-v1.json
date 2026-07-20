@@ -6,19 +6,20 @@
   },
   "providers": {
     "anthropic": {
-      "curated_model_count": 0,
+      "curated_model_count": 3,
       "discovery_kind": "official_api",
       "documentation_urls": [
+        "https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions",
         "https://platform.claude.com/docs/en/about-claude/models/overview",
         "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview",
         "https://platform.claude.com/docs/en/api/models/list"
       ],
       "inputs": [
         {
-          "bytes": 226,
+          "bytes": 1351,
           "kind": "curated",
           "path": "curated/anthropic.json",
-          "sha256": "3c5f5cb2a69dc0a8cd001eab75cbe618e8e196d030fdd295c41df2e7ecce0118"
+          "sha256": "f72c9c012262bbe31bf59ed2cac2ca70e44d54ebaefb6209188ae690f487163c"
         },
         {
           "bytes": 2865,
@@ -28,15 +29,15 @@
           "source_url": "https://api.anthropic.com/v1/models?limit=1000"
         },
         {
-          "bytes": 1791,
+          "bytes": 1938,
           "kind": "source_policy",
           "path": "sources/anthropic.json",
-          "sha256": "9d508ef78be4acd4d10a6a3091526d13f66603e19e5a8553115240a2f1313c54"
+          "sha256": "10ed4dbe0290ea5d26d5e8f92f6c0980f353f24c0253054255cec873e9244798"
         }
       ],
       "observed_at": "2026-07-18T00:00:00Z",
       "observed_model_count": 4,
-      "published_model_count": 3,
+      "published_model_count": 6,
       "skipped": {
         "unsupported_object_type": 1
       },
@@ -92,10 +93,10 @@
       ],
       "inputs": [
         {
-          "bytes": 3426,
+          "bytes": 15198,
           "kind": "curated",
           "path": "curated/openai.json",
-          "sha256": "0a944f9cd14b6208a68e683baa2d1bd0389f699a312d8b679d344f2e3ba906de"
+          "sha256": "12a41839307ebb4f91d51fe3934f443a2d81806ddda0485218ff9d768af8dcf0"
         },
         {
           "bytes": 1252,
@@ -118,7 +119,8 @@
         "not_reviewed_for_euler": 1
       },
       "warnings": [
-        "1 observed OpenAI model ids lack reviewed Euler metadata"
+        "1 observed OpenAI model ids lack reviewed Euler metadata",
+        "35 reviewed OpenAI model ids were absent from this account observation"
       ]
     },
     "openrouter": {
@@ -158,7 +160,7 @@
       "warnings": []
     },
     "xai": {
-      "curated_model_count": 9,
+      "curated_model_count": 11,
       "discovery_kind": "official_api",
       "documentation_urls": [
         "https://docs.x.ai/developers/migration/may-15-retirement",
@@ -169,10 +171,10 @@
       ],
       "inputs": [
         {
-          "bytes": 2807,
+          "bytes": 2813,
           "kind": "curated",
           "path": "curated/xai.json",
-          "sha256": "ad28cc48cbea5ce4ce27698281a710f8131ecea2c1abbdd911d35a7a247979fc"
+          "sha256": "f9a25126dda272e0ddf8e4cfac1ff69258bd5558956b1912025bc0c173fe415b"
         },
         {
           "bytes": 2379,
@@ -189,10 +191,10 @@
           "source_url": "https://api.x.ai/v1/models"
         },
         {
-          "bytes": 1842,
+          "bytes": 1972,
           "kind": "source_policy",
           "path": "sources/xai.json",
-          "sha256": "0216afbecc580999180c721c1d465a11ffff7357efca8b143909807e43802b74"
+          "sha256": "9dad1e8a60f6600cca4868fc93ac43afb64be5697f1538599efab2d9d983c18d"
         }
       ],
       "observed_at": "2026-07-18T00:00:00Z",
