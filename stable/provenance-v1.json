@@ -1,128 +1,163 @@
 {
-  "generated_at": "2026-07-18T22:16:17Z",
+  "generated_at": "2026-07-21T00:01:30Z",
   "generator": {
     "name": "euler-provider-catalog",
     "version": "0.1.0"
   },
   "providers": {
     "anthropic": {
-      "curated_model_count": 0,
-      "discovery_kind": "bootstrap",
+      "curated_model_count": 4,
+      "discovery_kind": "official_api",
       "documentation_urls": [
+        "https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions",
         "https://platform.claude.com/docs/en/about-claude/models/overview",
         "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview",
         "https://platform.claude.com/docs/en/api/models/list"
       ],
       "inputs": [
         {
-          "bytes": 142980,
-          "kind": "bootstrap",
-          "path": "bootstrap/catalog-v1.json",
-          "sha256": "0c791bd6d84b4f180ac569d91258f76b09bd89625f7d8df55a7e6198aaf740a4"
+          "bytes": 1351,
+          "kind": "curated",
+          "path": "curated/anthropic.json",
+          "sha256": "f72c9c012262bbe31bf59ed2cac2ca70e44d54ebaefb6209188ae690f487163c"
         },
         {
-          "bytes": 1194,
-          "kind": "bootstrap",
-          "path": "bootstrap/metadata-v1.json",
-          "sha256": "172b2cbf0c2fb5b774cd4761c1613f6172cad9f672d5cc26aaed65dcf2bbfaad"
+          "bytes": 8146,
+          "kind": "official_api",
+          "path": "observations/anthropic/models.json",
+          "sha256": "7704bf2d1c78248c43bdf87bf36a4455f6f31eb72d24ee490bbafe657c012224",
+          "source_url": "https://api.anthropic.com/v1/models?limit=1000"
+        },
+        {
+          "bytes": 1938,
+          "kind": "source_policy",
+          "path": "sources/anthropic.json",
+          "sha256": "10ed4dbe0290ea5d26d5e8f92f6c0980f353f24c0253054255cec873e9244798"
         }
       ],
-      "observed_at": "2026-07-18T22:16:17Z",
-      "observed_model_count": 0,
+      "observed_at": "2026-07-21T00:01:30Z",
+      "observed_model_count": 10,
       "published_model_count": 14,
       "skipped": {},
-      "warnings": [
-        "initial catalog imported from reviewed Euler built-ins at a2858905066e90f1c4a7e642c1117399d9a0c10d; no provider API observation is claimed"
-      ]
+      "warnings": []
     },
     "chatgpt": {
-      "curated_model_count": 0,
-      "discovery_kind": "bootstrap",
+      "curated_model_count": 7,
+      "discovery_kind": "official_snapshot",
       "documentation_urls": [
-        "https://developers.openai.com/codex/models"
+        "https://developers.openai.com/codex/models",
+        "https://github.com/openai/codex/blob/main/codex-rs/models-manager/models.json",
+        "https://github.com/openai/codex/blob/main/codex-rs/protocol/src/openai_models.rs",
+        "https://github.com/openai/codex/pull/33972"
       ],
       "inputs": [
         {
-          "bytes": 142980,
-          "kind": "bootstrap",
-          "path": "bootstrap/catalog-v1.json",
-          "sha256": "0c791bd6d84b4f180ac569d91258f76b09bd89625f7d8df55a7e6198aaf740a4"
+          "bytes": 2826,
+          "kind": "curated",
+          "path": "curated/chatgpt.json",
+          "sha256": "f21b265c45706a4ab2ec2013761b2e50227ef3648d2a304b32d48ab068922d78"
         },
         {
-          "bytes": 1194,
-          "kind": "bootstrap",
-          "path": "bootstrap/metadata-v1.json",
-          "sha256": "172b2cbf0c2fb5b774cd4761c1613f6172cad9f672d5cc26aaed65dcf2bbfaad"
+          "bytes": 893,
+          "kind": "official_snapshot",
+          "path": "observations/chatgpt/models.json",
+          "sha256": "8b35a263f13842d9a6ecb8b26b224b4714beefe0c6526a8964c6fe54a72c9c7d",
+          "source_url": "https://raw.githubusercontent.com/openai/codex/main/codex-rs/models-manager/models.json"
+        },
+        {
+          "bytes": 1650,
+          "kind": "source_policy",
+          "path": "sources/chatgpt.json",
+          "sha256": "a2a33586cd9ecc7392e1cb8dfeb4c9b4b1c77feaf669ddd53bb3d4903fc4da87"
         }
       ],
-      "observed_at": "2026-07-18T22:16:17Z",
-      "observed_model_count": 0,
+      "observed_at": "2026-07-21T00:01:30Z",
+      "observed_model_count": 8,
       "published_model_count": 7,
-      "skipped": {},
+      "skipped": {
+        "not_curated_for_euler": 2
+      },
       "warnings": [
-        "initial catalog imported from reviewed Euler built-ins at a2858905066e90f1c4a7e642c1117399d9a0c10d; no provider API observation is claimed"
+        "1 reviewed ChatGPT route was absent from the official Codex catalog; reviewed fallback metadata was retained",
+        "2 official ChatGPT routes lack reviewed Euler membership"
       ]
     },
     "openai": {
-      "curated_model_count": 0,
-      "discovery_kind": "bootstrap",
+      "curated_model_count": 44,
+      "discovery_kind": "official_api",
       "documentation_urls": [
         "https://developers.openai.com/api/docs/models",
         "https://platform.openai.com/docs/api-reference/models/list"
       ],
       "inputs": [
         {
-          "bytes": 142980,
-          "kind": "bootstrap",
-          "path": "bootstrap/catalog-v1.json",
-          "sha256": "0c791bd6d84b4f180ac569d91258f76b09bd89625f7d8df55a7e6198aaf740a4"
+          "bytes": 15198,
+          "kind": "curated",
+          "path": "curated/openai.json",
+          "sha256": "12a41839307ebb4f91d51fe3934f443a2d81806ddda0485218ff9d768af8dcf0"
         },
         {
-          "bytes": 1194,
-          "kind": "bootstrap",
-          "path": "bootstrap/metadata-v1.json",
-          "sha256": "172b2cbf0c2fb5b774cd4761c1613f6172cad9f672d5cc26aaed65dcf2bbfaad"
+          "bytes": 15862,
+          "kind": "official_api",
+          "path": "observations/openai/models.json",
+          "sha256": "19c1246de612c24b50299d0481b81fce2dfa8470011e11d196733547ff1ff996",
+          "source_url": "https://api.openai.com/v1/models"
+        },
+        {
+          "bytes": 1605,
+          "kind": "source_policy",
+          "path": "sources/openai.json",
+          "sha256": "f081fa9adf91bae07b539f02d24e027e27f93b0860eb4b3d72c75ec396dda46a"
         }
       ],
-      "observed_at": "2026-07-18T22:16:17Z",
-      "observed_model_count": 0,
-      "published_model_count": 45,
-      "skipped": {},
+      "observed_at": "2026-07-21T00:01:30Z",
+      "observed_model_count": 125,
+      "published_model_count": 44,
+      "skipped": {
+        "not_reviewed_for_euler": 81
+      },
       "warnings": [
-        "initial catalog imported from reviewed Euler built-ins at a2858905066e90f1c4a7e642c1117399d9a0c10d; no provider API observation is claimed"
+        "81 observed OpenAI model ids lack reviewed Euler metadata"
       ]
     },
     "openrouter": {
-      "curated_model_count": 0,
-      "discovery_kind": "bootstrap",
+      "curated_model_count": 3,
+      "discovery_kind": "official_api",
       "documentation_urls": [
         "https://openrouter.ai/docs/api/api-reference/models/get-models"
       ],
       "inputs": [
         {
-          "bytes": 142980,
-          "kind": "bootstrap",
-          "path": "bootstrap/catalog-v1.json",
-          "sha256": "0c791bd6d84b4f180ac569d91258f76b09bd89625f7d8df55a7e6198aaf740a4"
+          "bytes": 1353,
+          "kind": "curated",
+          "path": "curated/openrouter.json",
+          "sha256": "8e307cb64417816c0babd507327bdc1f1517600040783e4daf5cf3b062213f28"
         },
         {
-          "bytes": 1194,
-          "kind": "bootstrap",
-          "path": "bootstrap/metadata-v1.json",
-          "sha256": "172b2cbf0c2fb5b774cd4761c1613f6172cad9f672d5cc26aaed65dcf2bbfaad"
+          "bytes": 525635,
+          "kind": "official_api",
+          "path": "observations/openrouter/models.json",
+          "sha256": "e243de9d81fa7e6d193d303467ba8a37b1b53a5cfe87e83c1826f1adbc4d53d3",
+          "source_url": "https://openrouter.ai/api/v1/models"
+        },
+        {
+          "bytes": 1722,
+          "kind": "source_policy",
+          "path": "sources/openrouter.json",
+          "sha256": "87122d507d345ab55d78e269c5c9394ecdbf076b7295ef00398dfa5fc003b218"
         }
       ],
-      "observed_at": "2026-07-18T22:16:17Z",
-      "observed_model_count": 0,
-      "published_model_count": 270,
-      "skipped": {},
-      "warnings": [
-        "initial catalog imported from reviewed Euler built-ins at a2858905066e90f1c4a7e642c1117399d9a0c10d; no provider API observation is claimed"
-      ]
+      "observed_at": "2026-07-21T00:01:30Z",
+      "observed_model_count": 339,
+      "published_model_count": 269,
+      "skipped": {
+        "tools_not_supported": 71
+      },
+      "warnings": []
     },
     "xai": {
-      "curated_model_count": 0,
-      "discovery_kind": "bootstrap",
+      "curated_model_count": 44,
+      "discovery_kind": "official_api",
       "documentation_urls": [
         "https://docs.x.ai/developers/migration/may-15-retirement",
         "https://docs.x.ai/developers/model-capabilities/text/reasoning",
@@ -132,24 +167,38 @@
       ],
       "inputs": [
         {
-          "bytes": 142980,
-          "kind": "bootstrap",
-          "path": "bootstrap/catalog-v1.json",
-          "sha256": "0c791bd6d84b4f180ac569d91258f76b09bd89625f7d8df55a7e6198aaf740a4"
+          "bytes": 2813,
+          "kind": "curated",
+          "path": "curated/xai.json",
+          "sha256": "f9a25126dda272e0ddf8e4cfac1ff69258bd5558956b1912025bc0c173fe415b"
         },
         {
-          "bytes": 1194,
-          "kind": "bootstrap",
-          "path": "bootstrap/metadata-v1.json",
-          "sha256": "172b2cbf0c2fb5b774cd4761c1613f6172cad9f672d5cc26aaed65dcf2bbfaad"
+          "bytes": 5863,
+          "kind": "official_api",
+          "path": "observations/xai/language-models.json",
+          "sha256": "f9ac80b2fca88e0d2855a7fb4cad5c98851049493fa0ad1f4438a7806c803ab1",
+          "source_url": "https://api.x.ai/v1/language-models"
+        },
+        {
+          "bytes": 5815,
+          "kind": "official_api",
+          "path": "observations/xai/models.json",
+          "sha256": "ef5ea1f4ea8160117e67970914198f9128341a3b8ef089c1a8ff860702fb7ca3",
+          "source_url": "https://api.x.ai/v1/models"
+        },
+        {
+          "bytes": 1972,
+          "kind": "source_policy",
+          "path": "sources/xai.json",
+          "sha256": "9dad1e8a60f6600cca4868fc93ac43afb64be5697f1538599efab2d9d983c18d"
         }
       ],
-      "observed_at": "2026-07-18T22:16:17Z",
-      "observed_model_count": 0,
-      "published_model_count": 8,
+      "observed_at": "2026-07-21T00:01:30Z",
+      "observed_model_count": 6,
+      "published_model_count": 44,
       "skipped": {},
       "warnings": [
-        "initial catalog imported from reviewed Euler built-ins at a2858905066e90f1c4a7e642c1117399d9a0c10d; no provider API observation is claimed"
+        "2 reviewed xAI model ids were absent from this account observation"
       ]
     }
   },
