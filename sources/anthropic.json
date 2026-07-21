@@ -16,11 +16,12 @@
     "documentation_urls": [
       "https://platform.claude.com/docs/en/api/models/list",
       "https://platform.claude.com/docs/en/about-claude/models/overview",
+      "https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions",
       "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview"
     ]
   },
   "field_ownership": {
-    "membership": "official_api.data[]",
+    "membership": "official_api.data[] plus reviewed aliases from official_model_id_documentation",
     "id": "official_api.data[].id",
     "display_name": "official_api.data[].display_name",
     "context_window_tokens": "official_api.data[].max_input_tokens",

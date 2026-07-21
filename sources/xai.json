@@ -27,7 +27,7 @@
     ]
   },
   "field_ownership": {
-    "membership": "official_api.language_models.models[]",
+    "membership": "official_api.language_models.models[] ids and aliases plus reviewed deprecated redirect slugs",
     "id": "official_api.language_models.models[].id",
     "display_name": "official_id with reviewed overrides",
     "context_window_tokens": "official_api.models.data[].context_length",
@@ -35,6 +35,7 @@
     "supports_tools": "official_function_calling_contract",
     "supports_reasoning": "official_model_documentation when reviewed",
     "reasoning_efforts": "official_model_documentation when reviewed",
+    "status": "official_retirement_documentation with reviewed fallback",
     "default_model": "euler_curated"
   },
   "filters": {

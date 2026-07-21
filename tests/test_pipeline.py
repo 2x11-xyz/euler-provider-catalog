@@ -107,8 +107,28 @@ class PipelineTests(unittest.TestCase):
             model["id"] for model in artifacts["catalog-v1.json"]["providers"]["openai"]["models"]
         }
         self.assertNotIn("text-embedding-example", models)
+        self.assertNotIn("gpt-5.3-codex-spark", models)
         provenance = artifacts["provenance-v1.json"]["providers"]["openai"]
         self.assertEqual(provenance["skipped"]["not_reviewed_for_euler"], 1)
+
+    def test_openai_carries_reviewed_metadata_only_for_observed_ids(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            fixtures = Path(temporary) / "fixtures"
+            shutil.copytree(ROOT / "fixtures", fixtures)
+            path = fixtures / "openai" / "models.json"
+            payload = json.loads(path.read_bytes())
+            payload["data"].append({"id": "gpt-4", "object": "model", "owned_by": "system"})
+            path.write_bytes(canonical_json_bytes(payload))
+            refresh_sidecar(fixtures, "openai")
+
+            models = {
+                model["id"]: model
+                for model in generate(fixtures).documents["catalog-v1.json"]["providers"]["openai"][
+                    "models"
+                ]
+            }
+            self.assertEqual(models["gpt-4"]["context_window_tokens"], 8192)
+            self.assertNotIn("gpt-4-turbo", models)
 
     def test_generation_rejects_non_provider_owned_openai_records(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -124,11 +144,15 @@ class PipelineTests(unittest.TestCase):
                 generate(fixtures)
 
     def test_xai_lifecycle_and_reasoning_follow_official_docs(self) -> None:
+        artifacts = generate().documents
         models = {
             model["id"]: model
-            for model in generate().documents["catalog-v1.json"]["providers"]["xai"]["models"]
+            for model in artifacts["catalog-v1.json"]["providers"]["xai"]["models"]
         }
         self.assertEqual(models["grok-3"]["status"], "deprecated")
+        self.assertEqual(models["grok-3"]["display_name"], "Grok 3")
+        self.assertEqual(models["grok-3-fast"]["status"], "deprecated")
+        self.assertEqual(models["grok-3-fast"]["display_name"], "Grok 3 Fast")
         self.assertEqual(models["grok-code-fast-1"]["status"], "deprecated")
         self.assertEqual(
             models["grok-4.20-multi-agent-0309"]["reasoning_efforts"],
@@ -143,6 +167,22 @@ class PipelineTests(unittest.TestCase):
             models["grok-4.3"]["context_window_tokens"],
         )
         self.assertNotIn("max_output_tokens", models["grok-4.5"])
+        provenance = artifacts["provenance-v1.json"]["providers"]["xai"]
+        self.assertEqual(provenance["curated_model_count"], len(models))
+
+    def test_anthropic_documented_short_aliases_are_selectable_routes(self) -> None:
+        models = {
+            model["id"]
+            for model in generate().documents["catalog-v1.json"]["providers"]["anthropic"]["models"]
+        }
+        self.assertTrue(
+            {
+                "claude-haiku-4-5",
+                "claude-opus-4-1",
+                "claude-opus-4-5",
+                "claude-sonnet-4-5",
+            }.issubset(models)
+        )
 
     def test_generation_rejects_non_provider_owned_xai_records(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -413,6 +453,17 @@ class PipelineTests(unittest.TestCase):
                 path.write_bytes(canonical_json_bytes(payload))
                 with self.assertRaisesRegex(CatalogError, message):
                     generate(curated=curated)
+
+    def test_curated_models_and_additions_cannot_overlap(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            curated = Path(temporary) / "curated"
+            shutil.copytree(ROOT / "curated", curated)
+            path = curated / "xai.json"
+            payload = json.loads(path.read_bytes())
+            payload["additions"].append(payload["models"][0])
+            path.write_bytes(canonical_json_bytes(payload))
+            with self.assertRaisesRegex(CatalogError, "models and additions overlap"):
+                generate(curated=curated)
 
     def test_malformed_source_policy_fails_with_catalog_error(self) -> None:
         for missing_field in ("filters", "reasoning_effort_map", "default_reasoning_efforts"):

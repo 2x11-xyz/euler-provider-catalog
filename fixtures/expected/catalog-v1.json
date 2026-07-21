@@ -17,6 +17,26 @@
           "supports_tools": true
         },
         {
+          "context_window_tokens": 200000,
+          "display_name": "Claude Opus 4.1",
+          "id": "claude-opus-4-1",
+          "max_output_tokens": 32000,
+          "reasoning_efforts": [],
+          "status": "active",
+          "supports_reasoning": false,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 200000,
+          "display_name": "Claude Opus 4.5",
+          "id": "claude-opus-4-5",
+          "max_output_tokens": 64000,
+          "reasoning_efforts": [],
+          "status": "active",
+          "supports_reasoning": false,
+          "supports_tools": true
+        },
+        {
           "context_window_tokens": 1000000,
           "display_name": "Claude Opus 4.8",
           "id": "claude-opus-4-8",
@@ -30,6 +50,16 @@
           ],
           "status": "active",
           "supports_reasoning": true,
+          "supports_tools": true
+        },
+        {
+          "context_window_tokens": 1000000,
+          "display_name": "Claude Sonnet 4.5",
+          "id": "claude-sonnet-4-5",
+          "max_output_tokens": 64000,
+          "reasoning_efforts": [],
+          "status": "active",
+          "supports_reasoning": false,
           "supports_tools": true
         },
         {
@@ -433,7 +463,7 @@
           "display_name": "Grok 3 Fast",
           "id": "grok-3-fast",
           "reasoning_efforts": [],
-          "status": "active",
+          "status": "deprecated",
           "supports_reasoning": false,
           "supports_tools": true
         },
