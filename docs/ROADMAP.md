@@ -118,26 +118,27 @@ append-only.
 
 ## Phase 3: Euler consumption
 
-Implement this in small Euler pull requests after the first stable release
-exists:
+Status: implemented in Euler.
 
-1. Add strict Rust types and invariant validation for catalog v1 and manifest
-   v1.
-2. Embed the current stable catalog at build time so a fresh install and
-   offline launch always work.
-3. Change `euler models refresh` to fetch the latest GitHub Release manifest
-   and catalog with bounded size, timeout, redirect, schema, and SHA-256 checks.
-4. Atomically store the verified snapshot under a machine-owned catalog path;
-   preserve `~/.euler/models.json` as the user-owned override.
-5. Replace built-in model membership with the verified full snapshot, then
-   apply user additions and same-ID overrides.
-6. Keep headless commands offline. Add first-interactive-launch best-effort
-   refresh only after the explicit refresh path has dogfood evidence.
-7. Remove direct `models.dev` refresh ownership once the migration boundary is
-   tested against existing generated and user-authored files.
+- Strict Rust types and invariant validation cover catalog v1 and manifest v1.
+- The current verified release is embedded so fresh installations and offline
+  launches always have a complete baseline.
+- `euler models refresh` performs a bounded, explicit GitHub Release check and
+  atomically installs only a newer valid compatible snapshot.
+- Full-screen TUI sessions schedule the same refresh in the background when
+  due; ordinary headless session commands remain offline, while
+  `euler models refresh` is the explicit networked exception.
+- Managed releases live separately from the user-owned
+  `~/.euler/models.json` override, and direct `models.dev` refresh ownership has
+  been removed.
+- New Euler release builds are gated on embedding the latest published catalog.
 
-The Euler consumer never reads provider credentials and never learns provider
-transport from the catalog.
+The Euler catalog consumer never reads provider credentials and never learns
+provider transport from the catalog.
+
+The public behavior and release lifecycle are documented in Euler's
+[Provider catalog and model updates](https://github.com/2x11-xyz/euler/blob/main/docs/guides/provider-catalog.md)
+guide.
 
 ## Phase 4: adding providers safely
 
