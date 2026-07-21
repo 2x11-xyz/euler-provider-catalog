@@ -181,6 +181,41 @@ Artifact hashes and release IDs detect inconsistent or corrupted release
 content. They do not create a trust root independent of the official GitHub
 repository; repository controls and reviewed publication remain the authority.
 
+## How Euler consumes the catalog
+
+Every Euler release binary embeds a verified catalog snapshot, so a fresh
+installation can list providers and models offline:
+
+```console
+euler models
+```
+
+The full-screen TUI performs a non-blocking GitHub check when refresh is due.
+Users and automation can request the same check without opening a session:
+
+```console
+euler models refresh
+```
+
+Euler validates the release manifest, content identity, digest, schema,
+compatibility, and monotonic release time before writing a managed local cache.
+If refresh fails, it retains the embedded or last-known-good catalog. The
+refresh client downloads only public release files and does not use provider
+API keys. The user's optional `~/.euler/models.json` additions and same-ID
+metadata overrides are applied afterward.
+
+Before a new Euler version is tagged, maintainers synchronize the latest
+catalog release into the Euler source tree. Euler's release workflow refuses to
+build or publish a release from a new tag with a stale embedded snapshot, so
+prebuilt release binaries and source builds from that tag start from the same
+catalog. Existing binaries can consume newer compatible catalog releases at
+runtime; they do not need to be rebuilt for metadata-only changes.
+
+See Euler's
+[Provider catalog and model updates](https://github.com/2x11-xyz/euler/blob/main/docs/guides/provider-catalog.md)
+guide for the complete installation, runtime, cache, failure, and release-build
+lifecycle.
+
 ## License
 
 MIT
