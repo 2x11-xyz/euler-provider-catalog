@@ -1,8 +1,8 @@
 {
   "decision": "review_required",
-  "from_generated_at": "2026-07-18T22:16:17Z",
+  "from_generated_at": "2026-07-21T00:01:30Z",
   "from_minimum_euler_version": "0.1.1",
-  "from_release_id": "catalog-v1-20260718t221617z-d619088f6e7778720898f59eb19ef903bbbd712d8ebe24e66c668490ce26e5d9",
+  "from_release_id": "catalog-v1-20260721t000130z-2834472ff45442f2617675c8e2ed9c2cbca2e33b2e193c799cb4e68e49a2683b",
   "promotion_policy": {
     "maximum_shrink_basis_points": 1000,
     "sha256": "738f1b7e7ccbd5b20c0ab2860b3bcf8a8e5432d17ebdefe2b6521f226232f982"
@@ -11,253 +11,50 @@
     "anthropic": {
       "after_model_count": 14,
       "before_model_count": 14,
-      "curated_input_changed": true,
+      "curated_input_changed": false,
       "lifecycle_changes": [],
-      "metadata_changes": [
-        {
-          "fields": [
-            "display_name",
-            "reasoning_efforts",
-            "supports_reasoning"
-          ],
-          "id": "claude-haiku-4-5"
-        },
-        {
-          "fields": [
-            "reasoning_efforts",
-            "supports_reasoning"
-          ],
-          "id": "claude-haiku-4-5-20251001"
-        },
-        {
-          "fields": [
-            "display_name",
-            "reasoning_efforts",
-            "supports_reasoning"
-          ],
-          "id": "claude-opus-4-1"
-        },
-        {
-          "fields": [
-            "reasoning_efforts",
-            "supports_reasoning"
-          ],
-          "id": "claude-opus-4-1-20250805"
-        },
-        {
-          "fields": [
-            "display_name",
-            "reasoning_efforts",
-            "supports_reasoning"
-          ],
-          "id": "claude-opus-4-5"
-        },
-        {
-          "fields": [
-            "reasoning_efforts",
-            "supports_reasoning"
-          ],
-          "id": "claude-opus-4-5-20251101"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "claude-opus-4-6"
-        },
-        {
-          "fields": [
-            "display_name",
-            "reasoning_efforts",
-            "supports_reasoning"
-          ],
-          "id": "claude-sonnet-4-5"
-        },
-        {
-          "fields": [
-            "reasoning_efforts",
-            "supports_reasoning"
-          ],
-          "id": "claude-sonnet-4-5-20250929"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "claude-sonnet-4-6"
-        }
-      ],
+      "metadata_changes": [],
       "models_added": [],
       "models_removed": [],
       "provider_fields_changed": [],
       "shrink_basis_points": 0,
-      "source_policy_changed": true
+      "source_policy_changed": false
     },
     "chatgpt": {
       "after_model_count": 7,
       "before_model_count": 7,
-      "curated_input_changed": true,
+      "curated_input_changed": false,
       "lifecycle_changes": [],
-      "metadata_changes": [
-        {
-          "fields": [
-            "context_window_tokens"
-          ],
-          "id": "gpt-5.6-luna"
-        },
-        {
-          "fields": [
-            "context_window_tokens"
-          ],
-          "id": "gpt-5.6-sol"
-        },
-        {
-          "fields": [
-            "context_window_tokens"
-          ],
-          "id": "gpt-5.6-terra"
-        }
-      ],
+      "metadata_changes": [],
       "models_added": [],
       "models_removed": [],
       "provider_fields_changed": [],
       "shrink_basis_points": 0,
-      "source_policy_changed": true
+      "source_policy_changed": false
     },
     "openai": {
       "after_model_count": 44,
-      "before_model_count": 45,
-      "curated_input_changed": true,
+      "before_model_count": 44,
+      "curated_input_changed": false,
       "lifecycle_changes": [],
-      "metadata_changes": [
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "gpt-5"
-        },
-        {
-          "fields": [
-            "context_window_tokens"
-          ],
-          "id": "gpt-5.4"
-        },
-        {
-          "fields": [
-            "context_window_tokens"
-          ],
-          "id": "gpt-5.5"
-        },
-        {
-          "fields": [
-            "context_window_tokens"
-          ],
-          "id": "gpt-5.6-luna"
-        },
-        {
-          "fields": [
-            "context_window_tokens"
-          ],
-          "id": "gpt-5.6-sol"
-        },
-        {
-          "fields": [
-            "context_window_tokens"
-          ],
-          "id": "gpt-5.6-terra"
-        }
-      ],
+      "metadata_changes": [],
       "models_added": [],
-      "models_removed": [
-        "gpt-5.3-codex-spark"
-      ],
+      "models_removed": [],
       "provider_fields_changed": [],
-      "shrink_basis_points": 223,
-      "source_policy_changed": true
+      "shrink_basis_points": 0,
+      "source_policy_changed": false
     },
     "openrouter": {
-      "after_model_count": 269,
-      "before_model_count": 270,
-      "curated_input_changed": true,
+      "after_model_count": 273,
+      "before_model_count": 269,
+      "curated_input_changed": false,
       "lifecycle_changes": [],
       "metadata_changes": [
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "anthropic/claude-fable-5"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "anthropic/claude-opus-4.6"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "anthropic/claude-opus-4.7"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "anthropic/claude-opus-4.7-fast"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "anthropic/claude-opus-4.8"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "anthropic/claude-opus-4.8-fast"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "anthropic/claude-sonnet-4.6"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "anthropic/claude-sonnet-5"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "bytedance-seed/seed-2.0-lite"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "bytedance-seed/seed-2.0-mini"
-        },
         {
           "fields": [
             "context_window_tokens"
           ],
           "id": "deepseek/deepseek-chat"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "deepseek/deepseek-chat-v3-0324"
-        },
-        {
-          "fields": [
-            "context_window_tokens"
-          ],
-          "id": "deepseek/deepseek-r1"
         },
         {
           "fields": [
@@ -267,63 +64,19 @@
         },
         {
           "fields": [
-            "context_window_tokens",
-            "max_output_tokens"
+            "context_window_tokens"
           ],
-          "id": "deepseek/deepseek-v3.2"
+          "id": "google/gemini-3-pro-image"
         },
         {
           "fields": [
-            "max_output_tokens",
-            "reasoning_efforts"
-          ],
-          "id": "deepseek/deepseek-v4-flash"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "deepseek/deepseek-v4-pro"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "google/gemini-3-flash-preview"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "google/gemini-3.1-flash-lite"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "google/gemini-3.1-flash-lite-preview"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "google/gemini-3.1-pro-preview"
-        },
-        {
-          "fields": [
-            "context_window_tokens",
-            "reasoning_efforts"
+            "context_window_tokens"
           ],
           "id": "google/gemini-3.1-pro-preview-customtools"
         },
         {
           "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "google/gemini-3.5-flash"
-        },
-        {
-          "fields": [
+            "context_window_tokens",
             "max_output_tokens"
           ],
           "id": "google/gemma-3-27b-it"
@@ -336,45 +89,15 @@
         },
         {
           "fields": [
-            "context_window_tokens"
-          ],
-          "id": "google/gemma-4-26b-a4b-it:free"
-        },
-        {
-          "fields": [
             "max_output_tokens"
           ],
           "id": "google/gemma-4-31b-it"
         },
         {
           "fields": [
-            "max_output_tokens"
+            "context_window_tokens"
           ],
-          "id": "google/gemma-4-31b-it:free"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "inception/mercury-2"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "inclusionai/ring-2.6-1t"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "meta-llama/llama-3.1-8b-instruct"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "meta-llama/llama-3.3-70b-instruct"
+          "id": "kwaipilot/kat-coder-pro-v2"
         },
         {
           "fields": [
@@ -384,120 +107,7 @@
         },
         {
           "fields": [
-            "max_output_tokens"
-          ],
-          "id": "meta/muse-spark-1.1"
-        },
-        {
-          "fields": [
             "context_window_tokens"
-          ],
-          "id": "minimax/minimax-m2.5"
-        },
-        {
-          "fields": [
-            "context_window_tokens",
-            "max_output_tokens"
-          ],
-          "id": "minimax/minimax-m2.7"
-        },
-        {
-          "fields": [
-            "context_window_tokens",
-            "max_output_tokens"
-          ],
-          "id": "minimax/minimax-m3"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "mistralai/codestral-2508"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "mistralai/devstral-2512"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "mistralai/ministral-14b-2512"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "mistralai/ministral-3b-2512"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "mistralai/ministral-8b-2512"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "mistralai/mistral-large"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "mistralai/mistral-large-2407"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "mistralai/mistral-large-2512"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "mistralai/mistral-medium-3"
-        },
-        {
-          "fields": [
-            "max_output_tokens",
-            "reasoning_efforts"
-          ],
-          "id": "mistralai/mistral-medium-3-5"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "mistralai/mistral-medium-3.1"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "mistralai/mistral-nemo"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "mistralai/mistral-saba"
-        },
-        {
-          "fields": [
-            "max_output_tokens",
-            "reasoning_efforts"
-          ],
-          "id": "mistralai/mistral-small-2603"
-        },
-        {
-          "fields": [
-            "context_window_tokens",
-            "max_output_tokens"
           ],
           "id": "mistralai/mistral-small-3.2-24b-instruct"
         },
@@ -505,264 +115,26 @@
           "fields": [
             "max_output_tokens"
           ],
-          "id": "mistralai/mixtral-8x22b-instruct"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "mistralai/voxtral-small-24b-2507"
-        },
-        {
-          "fields": [
-            "context_window_tokens",
-            "max_output_tokens"
-          ],
-          "id": "moonshotai/kimi-k2.5"
-        },
-        {
-          "fields": [
-            "max_output_tokens",
-            "reasoning_efforts"
-          ],
-          "id": "moonshotai/kimi-k3"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "nvidia/nemotron-3-nano-30b-a3b:free"
-        },
-        {
-          "fields": [
-            "reasoning_efforts",
-            "supports_reasoning"
-          ],
-          "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
-        },
-        {
-          "fields": [
-            "context_window_tokens",
-            "max_output_tokens",
-            "reasoning_efforts"
-          ],
           "id": "nvidia/nemotron-3-super-120b-a12b"
         },
         {
           "fields": [
-            "context_window_tokens",
-            "reasoning_efforts"
+            "context_window_tokens"
           ],
           "id": "nvidia/nemotron-3-super-120b-a12b:free"
         },
         {
           "fields": [
             "context_window_tokens",
-            "max_output_tokens",
-            "reasoning_efforts"
+            "max_output_tokens"
           ],
           "id": "nvidia/nemotron-3-ultra-550b-a55b"
         },
         {
           "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "nvidia/nemotron-3-ultra-550b-a55b:free"
-        },
-        {
-          "fields": [
             "max_output_tokens"
-          ],
-          "id": "nvidia/nemotron-nano-9b-v2:free"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "openai/gpt-4.1"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5-mini"
-        },
-        {
-          "fields": [
-            "max_output_tokens",
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5-nano"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5-pro"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.1"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "openai/gpt-5.1-chat"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.1-codex"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.1-codex-max"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.1-codex-mini"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.2"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.2-codex"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.2-pro"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.3-codex"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.4"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.4-mini"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.4-nano"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.4-pro"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.5"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.5-pro"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.6-luna"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.6-luna-pro"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.6-sol"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.6-sol-pro"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.6-terra"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-5.6-terra-pro"
-        },
-        {
-          "fields": [
-            "max_output_tokens",
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-oss-120b"
-        },
-        {
-          "fields": [
-            "max_output_tokens",
-            "reasoning_efforts"
           ],
           "id": "openai/gpt-oss-20b"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/gpt-oss-20b:free"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/o3-mini-high"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "openai/o4-mini-high"
         },
         {
           "fields": [
@@ -778,38 +150,10 @@
         },
         {
           "fields": [
-            "reasoning_efforts",
-            "supports_reasoning"
-          ],
-          "id": "qwen/qwen-plus-2025-07-28"
-        },
-        {
-          "fields": [
             "context_window_tokens",
             "max_output_tokens"
           ],
           "id": "qwen/qwen3-14b"
-        },
-        {
-          "fields": [
-            "context_window_tokens",
-            "max_output_tokens"
-          ],
-          "id": "qwen/qwen3-235b-a22b-thinking-2507"
-        },
-        {
-          "fields": [
-            "context_window_tokens",
-            "max_output_tokens"
-          ],
-          "id": "qwen/qwen3-30b-a3b"
-        },
-        {
-          "fields": [
-            "context_window_tokens",
-            "max_output_tokens"
-          ],
-          "id": "qwen/qwen3-30b-a3b-instruct-2507"
         },
         {
           "fields": [
@@ -821,52 +165,31 @@
           "fields": [
             "context_window_tokens"
           ],
-          "id": "qwen/qwen3-32b"
-        },
-        {
-          "fields": [
-            "context_window_tokens"
-          ],
           "id": "qwen/qwen3-coder"
         },
         {
           "fields": [
-            "reasoning_efforts",
-            "supports_reasoning"
+            "context_window_tokens"
           ],
-          "id": "qwen/qwen3-coder-plus"
-        },
-        {
-          "fields": [
-            "reasoning_efforts",
-            "supports_reasoning"
-          ],
-          "id": "qwen/qwen3-max"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "qwen/qwen3-next-80b-a3b-instruct"
+          "id": "qwen/qwen3-coder-30b-a3b-instruct"
         },
         {
           "fields": [
             "context_window_tokens"
-          ],
-          "id": "qwen/qwen3-next-80b-a3b-thinking"
-        },
-        {
-          "fields": [
-            "context_window_tokens",
-            "max_output_tokens"
           ],
           "id": "qwen/qwen3-vl-235b-a22b-instruct"
         },
         {
           "fields": [
-            "context_window_tokens"
+            "max_output_tokens"
           ],
           "id": "qwen/qwen3-vl-30b-a3b-instruct"
+        },
+        {
+          "fields": [
+            "context_window_tokens"
+          ],
+          "id": "qwen/qwen3-vl-30b-a3b-thinking"
         },
         {
           "fields": [
@@ -890,117 +213,49 @@
           "fields": [
             "max_output_tokens"
           ],
-          "id": "qwen/qwen3.5-122b-a10b"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
           "id": "qwen/qwen3.5-27b"
         },
         {
           "fields": [
             "max_output_tokens"
           ],
-          "id": "qwen/qwen3.5-35b-a3b"
-        },
-        {
-          "fields": [
-            "context_window_tokens",
-            "max_output_tokens"
-          ],
-          "id": "qwen/qwen3.5-397b-a17b"
-        },
-        {
-          "fields": [
-            "context_window_tokens",
-            "max_output_tokens"
-          ],
           "id": "qwen/qwen3.6-27b"
         },
         {
           "fields": [
-            "reasoning_efforts",
-            "supports_reasoning"
-          ],
-          "id": "rekaai/reka-edge"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "sakana/fugu-ultra"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
+            "context_window_tokens"
           ],
           "id": "stepfun/step-3.7-flash"
         },
         {
           "fields": [
-            "max_output_tokens",
-            "reasoning_efforts"
+            "max_output_tokens"
           ],
           "id": "tencent/hy3"
         },
         {
           "fields": [
-            "max_output_tokens",
-            "reasoning_efforts"
-          ],
-          "id": "tencent/hy3-preview"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "tencent/hy3:free"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "thinkingmachines/inkling"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "upstage/solar-pro-3"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "x-ai/grok-4.20"
-        },
-        {
-          "fields": [
-            "max_output_tokens",
-            "reasoning_efforts"
-          ],
-          "id": "x-ai/grok-4.3"
-        },
-        {
-          "fields": [
-            "max_output_tokens",
-            "reasoning_efforts"
-          ],
-          "id": "x-ai/grok-4.5"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "x-ai/grok-build-0.1"
-        },
-        {
-          "fields": [
-            "context_window_tokens",
-            "max_output_tokens"
+            "context_window_tokens"
           ],
           "id": "xiaomi/mimo-v2.5"
+        },
+        {
+          "fields": [
+            "context_window_tokens"
+          ],
+          "id": "xiaomi/mimo-v2.5-pro"
+        },
+        {
+          "fields": [
+            "context_window_tokens"
+          ],
+          "id": "z-ai/glm-4.6"
+        },
+        {
+          "fields": [
+            "context_window_tokens"
+          ],
+          "id": "z-ai/glm-4.7"
         },
         {
           "fields": [
@@ -1011,230 +266,45 @@
         },
         {
           "fields": [
-            "context_window_tokens",
-            "max_output_tokens"
-          ],
-          "id": "z-ai/glm-5"
-        },
-        {
-          "fields": [
-            "context_window_tokens"
-          ],
-          "id": "z-ai/glm-5-turbo"
-        },
-        {
-          "fields": [
             "context_window_tokens"
           ],
           "id": "z-ai/glm-5.1"
-        },
-        {
-          "fields": [
-            "context_window_tokens",
-            "max_output_tokens",
-            "reasoning_efforts"
-          ],
-          "id": "z-ai/glm-5.2"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "~anthropic/claude-fable-latest"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "~anthropic/claude-opus-latest"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "~anthropic/claude-sonnet-latest"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "~google/gemini-flash-latest"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "~google/gemini-pro-latest"
-        },
-        {
-          "fields": [
-            "context_window_tokens",
-            "max_output_tokens",
-            "reasoning_efforts"
-          ],
-          "id": "~moonshotai/kimi-latest"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "~openai/gpt-latest"
-        },
-        {
-          "fields": [
-            "reasoning_efforts"
-          ],
-          "id": "~openai/gpt-mini-latest"
-        },
-        {
-          "fields": [
-            "max_output_tokens",
-            "reasoning_efforts"
-          ],
-          "id": "~x-ai/grok-latest"
         }
       ],
       "models_added": [
-        "meituan/longcat-2.0",
-        "openrouter/auto-beta"
+        "google/gemini-3.5-flash-lite",
+        "google/gemini-3.6-flash",
+        "inclusionai/ling-3.0-flash:free",
+        "poolside/laguna-s-2.1",
+        "poolside/laguna-s-2.1:free"
       ],
       "models_removed": [
-        "meta-llama/llama-3.3-70b-instruct:free",
-        "qwen/qwen3-coder:free",
-        "qwen/qwen3-next-80b-a3b-instruct:free"
+        "tencent/hy3:free"
       ],
       "provider_fields_changed": [],
-      "shrink_basis_points": 112,
-      "source_policy_changed": true
+      "shrink_basis_points": 38,
+      "source_policy_changed": false
     },
     "xai": {
       "after_model_count": 44,
-      "before_model_count": 8,
-      "curated_input_changed": true,
-      "lifecycle_changes": [
-        {
-          "after": "deprecated",
-          "before": "active",
-          "id": "grok-3"
-        },
-        {
-          "after": "deprecated",
-          "before": "active",
-          "id": "grok-3-fast"
-        },
-        {
-          "after": "deprecated",
-          "before": "active",
-          "id": "grok-code-fast-1"
-        }
-      ],
-      "metadata_changes": [
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "grok-3"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "grok-3-fast"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "grok-4.20-0309-non-reasoning"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "grok-4.20-0309-reasoning"
-        },
-        {
-          "fields": [
-            "max_output_tokens",
-            "reasoning_efforts"
-          ],
-          "id": "grok-4.3"
-        },
-        {
-          "fields": [
-            "max_output_tokens",
-            "reasoning_efforts"
-          ],
-          "id": "grok-4.5"
-        },
-        {
-          "fields": [
-            "max_output_tokens"
-          ],
-          "id": "grok-build-0.1"
-        },
-        {
-          "fields": [
-            "context_window_tokens",
-            "max_output_tokens"
-          ],
-          "id": "grok-code-fast-1"
-        }
-      ],
-      "models_added": [
-        "grok-4.20",
-        "grok-4.20-0309",
-        "grok-4.20-beta",
-        "grok-4.20-beta-0309",
-        "grok-4.20-beta-0309-non-reasoning",
-        "grok-4.20-beta-0309-reasoning",
-        "grok-4.20-beta-latest",
-        "grok-4.20-beta-latest-non-reasoning",
-        "grok-4.20-beta-latest-reasoning",
-        "grok-4.20-beta-non-reasoning",
-        "grok-4.20-beta-reasoning",
-        "grok-4.20-experimental-beta-0304",
-        "grok-4.20-experimental-beta-0304-non-reasoning",
-        "grok-4.20-experimental-beta-0304-reasoning",
-        "grok-4.20-experimental-beta-latest",
-        "grok-4.20-experimental-beta-non-reasoning-latest",
-        "grok-4.20-experimental-beta-reasoning-latest",
-        "grok-4.20-multi-agent",
-        "grok-4.20-multi-agent-0309",
-        "grok-4.20-multi-agent-beta-0309",
-        "grok-4.20-multi-agent-beta-latest",
-        "grok-4.20-multi-agent-experimental-beta-0304",
-        "grok-4.20-multi-agent-experimental-beta-latest",
-        "grok-4.20-multi-agent-latest",
-        "grok-4.20-non-reasoning",
-        "grok-4.20-non-reasoning-gv2",
-        "grok-4.20-non-reasoning-latest",
-        "grok-4.20-reasoning",
-        "grok-4.20-reasoning-gv2",
-        "grok-4.20-reasoning-latest",
-        "grok-4.3-latest",
-        "grok-4.5-latest",
-        "grok-build-latest",
-        "grok-code-fast",
-        "grok-code-fast-1-0825",
-        "grok-latest"
-      ],
+      "before_model_count": 44,
+      "curated_input_changed": false,
+      "lifecycle_changes": [],
+      "metadata_changes": [],
+      "models_added": [],
       "models_removed": [],
       "provider_fields_changed": [],
       "shrink_basis_points": 0,
-      "source_policy_changed": true
+      "source_policy_changed": false
     }
   },
   "reasons": [
-    "curated_input_changed",
     "model_addition",
-    "model_lifecycle_changed",
     "model_metadata_changed",
-    "model_removal",
-    "source_policy_changed"
+    "model_removal"
   ],
   "schema_version": 1,
-  "to_generated_at": "2026-07-21T00:01:30Z",
+  "to_generated_at": "2026-07-24T06:38:07Z",
   "to_minimum_euler_version": "0.1.1",
-  "to_release_id": "catalog-v1-20260721t000130z-2834472ff45442f2617675c8e2ed9c2cbca2e33b2e193c799cb4e68e49a2683b"
+  "to_release_id": "catalog-v1-20260724t063807z-de3c30f60d028c3a3e18f83d4d793905e261c2d936d1c918828ae38f62ef4366"
 }

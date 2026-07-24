@@ -1,16 +1,16 @@
 {
   "artifacts": {
     "catalog-v1.json": {
-      "bytes": 152593,
-      "sha256": "bf3cb671579a1008d81cc15180a37311c8c864a9d073f16009bcbddfdb1ff197"
+      "bytes": 154415,
+      "sha256": "d43fcedd7128818ffbcda99ad9c83040aa77aef36d8b398336e5198d613fb94e"
     },
     "provenance-v1.json": {
       "bytes": 7206,
-      "sha256": "bcdcd39626d0de12d1669626c1f71d711f2833fac100ba78027a08ac2c8d206f"
+      "sha256": "555a2a2b7bebd68448ee2c9ec89f2ffe6afc7022ffb16fa79d6055aafd81875b"
     }
   },
-  "generated_at": "2026-07-21T00:01:30Z",
+  "generated_at": "2026-07-24T06:38:07Z",
   "minimum_euler_version": "0.1.1",
-  "release_id": "catalog-v1-20260721t000130z-2834472ff45442f2617675c8e2ed9c2cbca2e33b2e193c799cb4e68e49a2683b",
+  "release_id": "catalog-v1-20260724t063807z-de3c30f60d028c3a3e18f83d4d793905e261c2d936d1c918828ae38f62ef4366",
   "schema_version": 1
 }

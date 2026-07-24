@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T00:01:30Z",
+  "generated_at": "2026-07-24T06:38:07Z",
   "generator": {
     "name": "euler-provider-catalog",
     "version": "0.1.0"
@@ -35,7 +35,7 @@
           "sha256": "10ed4dbe0290ea5d26d5e8f92f6c0980f353f24c0253054255cec873e9244798"
         }
       ],
-      "observed_at": "2026-07-21T00:01:30Z",
+      "observed_at": "2026-07-24T06:38:07Z",
       "observed_model_count": 10,
       "published_model_count": 14,
       "skipped": {},
@@ -71,7 +71,7 @@
           "sha256": "a2a33586cd9ecc7392e1cb8dfeb4c9b4b1c77feaf669ddd53bb3d4903fc4da87"
         }
       ],
-      "observed_at": "2026-07-21T00:01:30Z",
+      "observed_at": "2026-07-24T06:38:07Z",
       "observed_model_count": 8,
       "published_model_count": 7,
       "skipped": {
@@ -100,7 +100,7 @@
           "bytes": 15862,
           "kind": "official_api",
           "path": "observations/openai/models.json",
-          "sha256": "19c1246de612c24b50299d0481b81fce2dfa8470011e11d196733547ff1ff996",
+          "sha256": "c25f46c2ea4a2d7f3e71658e16359a884c87de0fc8dd3b4dfeb3ff00c85f28c8",
           "source_url": "https://api.openai.com/v1/models"
         },
         {
@@ -110,7 +110,7 @@
           "sha256": "f081fa9adf91bae07b539f02d24e027e27f93b0860eb4b3d72c75ec396dda46a"
         }
       ],
-      "observed_at": "2026-07-21T00:01:30Z",
+      "observed_at": "2026-07-24T06:38:07Z",
       "observed_model_count": 125,
       "published_model_count": 44,
       "skipped": {
@@ -134,10 +134,10 @@
           "sha256": "8e307cb64417816c0babd507327bdc1f1517600040783e4daf5cf3b062213f28"
         },
         {
-          "bytes": 525635,
+          "bytes": 532021,
           "kind": "official_api",
           "path": "observations/openrouter/models.json",
-          "sha256": "e243de9d81fa7e6d193d303467ba8a37b1b53a5cfe87e83c1826f1adbc4d53d3",
+          "sha256": "4a9495f93762d246aea2cbce49449d3ef3cf230817203d043c269c3453e30cd1",
           "source_url": "https://openrouter.ai/api/v1/models"
         },
         {
@@ -147,9 +147,9 @@
           "sha256": "87122d507d345ab55d78e269c5c9394ecdbf076b7295ef00398dfa5fc003b218"
         }
       ],
-      "observed_at": "2026-07-21T00:01:30Z",
-      "observed_model_count": 339,
-      "published_model_count": 269,
+      "observed_at": "2026-07-24T06:38:07Z",
+      "observed_model_count": 343,
+      "published_model_count": 273,
       "skipped": {
         "tools_not_supported": 71
       },
@@ -176,7 +176,7 @@
           "bytes": 5863,
           "kind": "official_api",
           "path": "observations/xai/language-models.json",
-          "sha256": "f9ac80b2fca88e0d2855a7fb4cad5c98851049493fa0ad1f4438a7806c803ab1",
+          "sha256": "19d26ea0c74b83c386f007cf3cf51589275fd4ccc8f9a1e83b90d23c6fa0463d",
           "source_url": "https://api.x.ai/v1/language-models"
         },
         {
@@ -193,7 +193,7 @@
           "sha256": "9dad1e8a60f6600cca4868fc93ac43afb64be5697f1538599efab2d9d983c18d"
         }
       ],
-      "observed_at": "2026-07-21T00:01:30Z",
+      "observed_at": "2026-07-24T06:38:07Z",
       "observed_model_count": 6,
       "published_model_count": 44,
       "skipped": {},
