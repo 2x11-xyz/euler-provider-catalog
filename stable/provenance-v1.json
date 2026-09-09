@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T00:01:30Z",
+  "generated_at": "2026-09-09T08:56:46Z",
   "generator": {
     "name": "euler-provider-catalog",
     "version": "0.1.0"
@@ -22,10 +22,10 @@
           "sha256": "f72c9c012262bbe31bf59ed2cac2ca70e44d54ebaefb6209188ae690f487163c"
         },
         {
-          "bytes": 8146,
+          "bytes": 8931,
           "kind": "official_api",
           "path": "observations/anthropic/models.json",
-          "sha256": "7704bf2d1c78248c43bdf87bf36a4455f6f31eb72d24ee490bbafe657c012224",
+          "sha256": "889053918482ced83464086ed97d7a14159222a94749632f5792144e81227a19",
           "source_url": "https://api.anthropic.com/v1/models?limit=1000"
         },
         {
@@ -35,9 +35,9 @@
           "sha256": "10ed4dbe0290ea5d26d5e8f92f6c0980f353f24c0253054255cec873e9244798"
         }
       ],
-      "observed_at": "2026-07-21T00:01:30Z",
-      "observed_model_count": 10,
-      "published_model_count": 14,
+      "observed_at": "2026-09-09T08:56:46Z",
+      "observed_model_count": 11,
+      "published_model_count": 15,
       "skipped": {},
       "warnings": []
     },
@@ -58,10 +58,10 @@
           "sha256": "f21b265c45706a4ab2ec2013761b2e50227ef3648d2a304b32d48ab068922d78"
         },
         {
-          "bytes": 893,
+          "bytes": 1244,
           "kind": "official_snapshot",
           "path": "observations/chatgpt/models.json",
-          "sha256": "8b35a263f13842d9a6ecb8b26b224b4714beefe0c6526a8964c6fe54a72c9c7d",
+          "sha256": "5a9819bbc9c14db6c9580a3a527de44aa1c92abe00d3ce88321cd1a929a7b09e",
           "source_url": "https://raw.githubusercontent.com/openai/codex/main/codex-rs/models-manager/models.json"
         },
         {
@@ -71,15 +71,15 @@
           "sha256": "a2a33586cd9ecc7392e1cb8dfeb4c9b4b1c77feaf669ddd53bb3d4903fc4da87"
         }
       ],
-      "observed_at": "2026-07-21T00:01:30Z",
-      "observed_model_count": 8,
+      "observed_at": "2026-09-09T08:56:46Z",
+      "observed_model_count": 11,
       "published_model_count": 7,
       "skipped": {
-        "not_curated_for_euler": 2
+        "not_curated_for_euler": 5
       },
       "warnings": [
         "1 reviewed ChatGPT route was absent from the official Codex catalog; reviewed fallback metadata was retained",
-        "2 official ChatGPT routes lack reviewed Euler membership"
+        "5 official ChatGPT routes lack reviewed Euler membership"
       ]
     },
     "openai": {
@@ -97,10 +97,10 @@
           "sha256": "12a41839307ebb4f91d51fe3934f443a2d81806ddda0485218ff9d768af8dcf0"
         },
         {
-          "bytes": 15862,
+          "bytes": 20221,
           "kind": "official_api",
           "path": "observations/openai/models.json",
-          "sha256": "19c1246de612c24b50299d0481b81fce2dfa8470011e11d196733547ff1ff996",
+          "sha256": "4fbe275f6775a97dd7ce79ddc115753fb431fad46cd08d39f99c92319d7f1ff7",
           "source_url": "https://api.openai.com/v1/models"
         },
         {
@@ -110,14 +110,14 @@
           "sha256": "f081fa9adf91bae07b539f02d24e027e27f93b0860eb4b3d72c75ec396dda46a"
         }
       ],
-      "observed_at": "2026-07-21T00:01:30Z",
-      "observed_model_count": 125,
+      "observed_at": "2026-09-09T08:56:46Z",
+      "observed_model_count": 127,
       "published_model_count": 44,
       "skipped": {
-        "not_reviewed_for_euler": 81
+        "not_reviewed_for_euler": 83
       },
       "warnings": [
-        "81 observed OpenAI model ids lack reviewed Euler metadata"
+        "83 observed OpenAI model ids lack reviewed Euler metadata"
       ]
     },
     "openrouter": {
@@ -134,10 +134,10 @@
           "sha256": "8e307cb64417816c0babd507327bdc1f1517600040783e4daf5cf3b062213f28"
         },
         {
-          "bytes": 525635,
+          "bytes": 709184,
           "kind": "official_api",
           "path": "observations/openrouter/models.json",
-          "sha256": "e243de9d81fa7e6d193d303467ba8a37b1b53a5cfe87e83c1826f1adbc4d53d3",
+          "sha256": "2a967480dbccf1ed26e59ea6ae86ac6d43c5769c033db2fac3febcc83586e21f",
           "source_url": "https://openrouter.ai/api/v1/models"
         },
         {
@@ -147,16 +147,16 @@
           "sha256": "87122d507d345ab55d78e269c5c9394ecdbf076b7295ef00398dfa5fc003b218"
         }
       ],
-      "observed_at": "2026-07-21T00:01:30Z",
-      "observed_model_count": 339,
-      "published_model_count": 269,
+      "observed_at": "2026-09-09T08:56:46Z",
+      "observed_model_count": 431,
+      "published_model_count": 365,
       "skipped": {
-        "tools_not_supported": 71
+        "tools_not_supported": 67
       },
       "warnings": []
     },
     "xai": {
-      "curated_model_count": 44,
+      "curated_model_count": 43,
       "discovery_kind": "official_api",
       "documentation_urls": [
         "https://docs.x.ai/developers/migration/may-15-retirement",
@@ -173,17 +173,17 @@
           "sha256": "f9a25126dda272e0ddf8e4cfac1ff69258bd5558956b1912025bc0c173fe415b"
         },
         {
-          "bytes": 5863,
+          "bytes": 6567,
           "kind": "official_api",
           "path": "observations/xai/language-models.json",
-          "sha256": "f9ac80b2fca88e0d2855a7fb4cad5c98851049493fa0ad1f4438a7806c803ab1",
+          "sha256": "90d18307fd7112b223075f098751119db1be57c6beb2a8d506def7d8ef527431",
           "source_url": "https://api.x.ai/v1/language-models"
         },
         {
-          "bytes": 5815,
+          "bytes": 7062,
           "kind": "official_api",
           "path": "observations/xai/models.json",
-          "sha256": "ef5ea1f4ea8160117e67970914198f9128341a3b8ef089c1a8ff860702fb7ca3",
+          "sha256": "c154660db339f15f5c32a892653e8edab47fcf13da1902385c06f46454785208",
           "source_url": "https://api.x.ai/v1/models"
         },
         {
@@ -193,8 +193,8 @@
           "sha256": "9dad1e8a60f6600cca4868fc93ac43afb64be5697f1538599efab2d9d983c18d"
         }
       ],
-      "observed_at": "2026-07-21T00:01:30Z",
-      "observed_model_count": 6,
+      "observed_at": "2026-09-09T08:56:46Z",
+      "observed_model_count": 7,
       "published_model_count": 44,
       "skipped": {},
       "warnings": [
